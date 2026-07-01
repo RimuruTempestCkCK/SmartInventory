@@ -8,10 +8,19 @@ if (empty($id)) {
     exit;
 }
 
-$query = "DELETE FROM brands WHERE id = '$id'";
-if (mysqli_query($conn, $query)) {
-    echo json_encode(["status" => true, "message" => "Brand berhasil dihapus"]);
-} else {
-    echo json_encode(["status" => false, "message" => "Gagal menghapus brand: " . mysqli_error($conn)]);
+mysqli_begin_transaction($conn);
+try {
+    mysqli_query($conn, "UPDATE products SET brand_id = NULL WHERE brand_id = '$id'");
+    
+    $query = "DELETE FROM brands WHERE id = '$id'";
+    if (mysqli_query($conn, $query)) {
+        mysqli_commit($conn);
+        echo json_encode(["status" => true, "message" => "Brand berhasil dihapus"]);
+    } else {
+        throw new Exception(mysqli_error($conn));
+    }
+} catch (Exception $e) {
+    mysqli_rollback($conn);
+    echo json_encode(["status" => false, "message" => "Gagal menghapus brand: " . $e->getMessage()]);
 }
 ?>

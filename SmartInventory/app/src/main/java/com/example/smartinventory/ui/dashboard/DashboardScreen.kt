@@ -3,8 +3,6 @@ package com.example.smartinventory.ui.dashboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -31,195 +29,435 @@ fun DashboardScreen(
     val stats by viewModel.stats.collectAsState()
     val prediction by viewModel.prediction.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    
+    var selectedTab by remember { mutableStateOf(0) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("SMART INVENTORY", fontWeight = FontWeight.ExtraBold, color = Color.White) },
-                actions = { IconButton(onClick = onLogout) { Icon(Icons.Default.ExitToApp, "Keluar", tint = Color.White) } },
+                title = { 
+                    Text(
+                        text = when(selectedTab) {
+                            0 -> "DASHBOARD"
+                            1 -> "MASTER DATA"
+                            2 -> "TRANSAKSI STOK"
+                            else -> "LAPORAN & MONITORING"
+                        }, 
+                        fontWeight = FontWeight.ExtraBold, 
+                        color = Color.White
+                    ) 
+                },
+                actions = { 
+                    IconButton(onClick = onLogout) { 
+                        Icon(Icons.Default.ExitToApp, "Keluar", tint = Color.White) 
+                    } 
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = BrownPrimary)
             )
         },
+        bottomBar = {
+            NavigationBar(
+                containerColor = AppSurface,
+                tonalElevation = 8.dp
+            ) {
+                NavigationBarItem(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    icon = { Icon(Icons.Default.Dashboard, contentDescription = "Dashboard") },
+                    label = { Text("Home", fontSize = 10.sp) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color.White,
+                        selectedTextColor = BrownPrimary,
+                        indicatorColor = BrownPrimary,
+                        unselectedIconColor = TextSecondary,
+                        unselectedTextColor = TextSecondary
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    icon = { Icon(Icons.Default.Layers, contentDescription = "Master") },
+                    label = { Text("Master", fontSize = 10.sp) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color.White,
+                        selectedTextColor = BrownPrimary,
+                        indicatorColor = BrownPrimary,
+                        unselectedIconColor = TextSecondary,
+                        unselectedTextColor = TextSecondary
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
+                    icon = { Icon(Icons.Default.SwapVert, contentDescription = "Stok") },
+                    label = { Text("Stok", fontSize = 10.sp) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color.White,
+                        selectedTextColor = BrownPrimary,
+                        indicatorColor = BrownPrimary,
+                        unselectedIconColor = TextSecondary,
+                        unselectedTextColor = TextSecondary
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 3,
+                    onClick = { selectedTab = 3 },
+                    icon = { Icon(Icons.Default.Assessment, contentDescription = "Laporan") },
+                    label = { Text("Laporan", fontSize = 10.sp) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color.White,
+                        selectedTextColor = BrownPrimary,
+                        indicatorColor = BrownPrimary,
+                        unselectedIconColor = TextSecondary,
+                        unselectedTextColor = TextSecondary
+                    )
+                )
+            }
+        },
         containerColor = AppBackground
     ) { padding ->
-        LazyColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(16.dp)) {
-            // 1. Welcome Card
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth().height(140.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    elevation = CardDefaults.cardElevation(4.dp)
-                ) {
-                    Box(modifier = Modifier.fillMaxSize().background(Brush.linearGradient(listOf(BrownPrimary, BrownSecondary))).padding(24.dp)) {
-                        Column(modifier = Modifier.align(Alignment.CenterStart)) {
-                            Text("Smart Inventory System", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text("Halo, Admin", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp)
-                            Text("Kelola stok aksesoris dengan mudah", color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
-                        }
-                        Icon(
-                            Icons.Default.Inventory2, 
-                            null, 
-                            tint = Color.White.copy(alpha = 0.2f),
-                            modifier = Modifier.size(100.dp).align(Alignment.CenterEnd).offset(x = 20.dp)
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-
-            // 2. Info Cards (Refined)
-            item {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    StatBox("Total Produk", stats?.totalProducts?.toString() ?: "0", Icons.Default.Inventory, Modifier.weight(1f))
-                    StatBox("Total Brand", stats?.totalBrands?.toString() ?: "0", Icons.Default.BrandingWatermark, Modifier.weight(1f))
-                    StatBox("Supplier", stats?.totalSuppliers?.toString() ?: "0", Icons.Default.LocalShipping, Modifier.weight(1f))
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    StatBox("Masuk Hari Ini", stats?.stockInToday?.toString() ?: "0", Icons.Default.AddBox, Modifier.weight(1f), SuccessGreen)
-                    StatBox("Keluar Hari Ini", stats?.stockOutToday?.toString() ?: "0", Icons.Default.IndeterminateCheckBox, Modifier.weight(1f), ErrorRed)
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-
-            // 3. AI Prediction Summary (Enhanced)
-            item {
-                Text("AI INSIGHTS", color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
-                Spacer(modifier = Modifier.height(12.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = BrownAccent.copy(alpha = 0.3f)),
-                    shape = RoundedCornerShape(20.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, BrownPrimary.copy(alpha = 0.2f))
-                ) {
-                    Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Surface(
-                            color = BrownPrimary,
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.size(48.dp)
-                        ) {
-                            Icon(Icons.Default.AutoAwesome, "AI", tint = Color.White, modifier = Modifier.padding(10.dp))
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text(prediction?.result ?: "Menganalisis stok...", color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                            Text("Akurasi Prediksi: ${(prediction?.probability?.times(100))?.toInt()}%", color = TextSecondary, fontSize = 12.sp)
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        IconButton(onClick = { onMenuClick("prediksi") }) {
-                            Icon(Icons.Default.ChevronRight, null, tint = BrownPrimary)
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-
-            // 4. Notifikasi Stok Menipis (Professional Alert)
-            if (stats?.lowStockProducts?.isNotEmpty() == true) {
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = ErrorRed.copy(alpha = 0.05f)),
-                        shape = RoundedCornerShape(16.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, ErrorRed.copy(alpha = 0.2f))
-                    ) {
-                        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Warning, "Peringatan", tint = ErrorRed, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text("${stats?.lowStockProducts?.size} item butuh restock segera!", color = ErrorRed, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-                }
-            }
-
-            // 5. Menu Grid (Optimized)
-            item {
-                MenuSection("MASTER DATA") {
-                    MenuRow(
-                        listOf(
-                            Triple("Barang", Icons.Default.Inventory, "barang"),
-                            Triple("Kategori", Icons.Default.Category, "kategori"),
-                            Triple("Brand", Icons.Default.BrandingWatermark, "brand")
-                        ), onMenuClick
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    MenuRow(
-                        listOf(
-                            Triple("Supplier", Icons.Default.LocalShipping, "supplier"),
-                            null,
-                            null
-                        ), onMenuClick
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                MenuSection("TRANSAKSI STOK") {
-                    MenuRow(
-                        listOf(
-                            Triple("Stok Masuk", Icons.Default.AddCircle, "stok_masuk"),
-                            Triple("Stok Keluar", Icons.Default.RemoveCircle, "stok_keluar"),
-                            Triple("Riwayat", Icons.Default.History, "riwayat")
-                        ), onMenuClick
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                MenuSection("MONITORING & LAPORAN") {
-                    MenuRow(
-                        listOf(
-                            Triple("Monitor", Icons.Default.MonitorHeart, "monitoring"),
-                            Triple("Cari Barang", Icons.Default.Search, "search"),
-                            Triple("Notifikasi", Icons.Default.NotificationsActive, "monitoring")
-                        ), onMenuClick
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    MenuRow(
-                        listOf(
-                            Triple("Laporan", Icons.Default.Assessment, "laporan"),
-                            null,
-                            null
-                        ), onMenuClick
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                MenuSection("PENGATURAN") {
-                    MenuRow(
-                        listOf(
-                            Triple("Manajemen User", Icons.Default.People, "users"),
-                            null,
-                            null
-                        ), onMenuClick
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(32.dp))
+        Box(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            when (selectedTab) {
+                0 -> DashboardHomeTab(
+                    stats = stats,
+                    prediction = prediction,
+                    isLoading = isLoading,
+                    onMenuClick = onMenuClick
+                )
+                1 -> MasterDataTab(onMenuClick = onMenuClick)
+                2 -> TransactionTab(onMenuClick = onMenuClick)
+                3 -> ReportTab(stats = stats, onMenuClick = onMenuClick)
             }
         }
     }
 }
 
 @Composable
-fun MenuSection(title: String, content: @Composable () -> Unit) {
-    Column {
-        Text(title, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
-        Spacer(modifier = Modifier.height(12.dp))
-        content()
+fun DashboardHomeTab(
+    stats: com.example.smartinventory.data.model.DashboardStats?,
+    prediction: com.example.smartinventory.data.model.PredictionResponse?,
+    isLoading: Boolean,
+    onMenuClick: (String) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // 1. Welcome Card
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp),
+                shape = RoundedCornerShape(20.dp),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Brush.linearGradient(listOf(BrownPrimary, BrownSecondary)))
+                        .padding(20.dp)
+                ) {
+                    Column(modifier = Modifier.align(Alignment.CenterStart)) {
+                        Text(
+                            "Smart Inventory System",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            "Halo, Admin & Staff",
+                            color = Color.White,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 24.sp
+                        )
+                        Text(
+                            "Kelola stok aksesoris dengan mudah & cepat",
+                            color = Color.White.copy(alpha = 0.7f),
+                            fontSize = 12.sp
+                        )
+                    }
+                    Icon(
+                        Icons.Default.Inventory2,
+                        null,
+                        tint = Color.White.copy(alpha = 0.15f),
+                        modifier = Modifier
+                            .size(90.dp)
+                            .align(Alignment.CenterEnd)
+                            .offset(x = 10.dp)
+                    )
+                }
+            }
+        }
+
+        // 2. Info Cards
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatBox("Total Produk", stats?.totalProducts?.toString() ?: "0", Icons.Default.Inventory, Modifier.weight(1f))
+                    StatBox("Total Brand", stats?.totalBrands?.toString() ?: "0", Icons.Default.BrandingWatermark, Modifier.weight(1f))
+                    StatBox("Supplier", stats?.totalSuppliers?.toString() ?: "0", Icons.Default.LocalShipping, Modifier.weight(1f))
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatBox("Masuk Hari Ini", stats?.stockInToday?.toString() ?: "0", Icons.Default.AddBox, Modifier.weight(1f), SuccessGreen)
+                    StatBox("Keluar Hari Ini", stats?.stockOutToday?.toString() ?: "0", Icons.Default.IndeterminateCheckBox, Modifier.weight(1f), ErrorRed)
+                }
+            }
+        }
+
+        // 3. AI Prediction Summary
+        item {
+            Column {
+                Text(
+                    "AI INSIGHTS (PREDIKSI STOK)",
+                    color = TextPrimary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = 1.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = BrownAccent.copy(alpha = 0.25f)),
+                    shape = RoundedCornerShape(16.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, BrownPrimary.copy(alpha = 0.15f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            color = BrownPrimary,
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.AutoAwesome,
+                                "AI",
+                                tint = Color.White,
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            val predictionResult = prediction?.result ?: "Menganalisis stok..."
+                            val accuracyPercent = if (prediction?.probability != null) {
+                                "${(prediction.probability * 100).toInt()}%"
+                            } else {
+                                "..."
+                            }
+                            Text(
+                                predictionResult,
+                                color = TextPrimary,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                            Text(
+                                "Akurasi Prediksi: $accuracyPercent",
+                                color = TextSecondary,
+                                fontSize = 12.sp
+                            )
+                        }
+                        IconButton(onClick = { onMenuClick("prediksi") }) {
+                            Icon(Icons.Default.ChevronRight, null, tint = BrownPrimary)
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Notifikasi Stok Menipis
+        if (stats?.lowStockProducts?.isNotEmpty() == true) {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = ErrorRed.copy(alpha = 0.05f)),
+                    shape = RoundedCornerShape(12.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, ErrorRed.copy(alpha = 0.2f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Warning,
+                            "Peringatan",
+                            tint = ErrorRed,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            "${stats.lowStockProducts.size} item mendekati batas minimum stok!",
+                            color = ErrorRed,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun MenuRow(items: List<Triple<String, ImageVector, String>?>, onMenuClick: (String) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        items.forEach { item ->
-            if (item != null) {
-                SimpleMenu(item.first, item.second, Modifier.weight(1f)) { onMenuClick(item.third) }
-            } else {
-                Box(Modifier.weight(1f))
+fun MasterDataTab(onMenuClick: (String) -> Unit) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            Text(
+                "MASTER DATA MANAGEMENT",
+                color = TextPrimary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = 1.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                "Kelola data utama inventaris barang dan relasi databasenya.",
+                color = TextSecondary,
+                fontSize = 12.sp
+            )
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SimpleMenu("Data Barang", Icons.Default.Inventory, Modifier.weight(1f)) {
+                        onMenuClick("barang")
+                    }
+                    SimpleMenu("Kategori", Icons.Default.Category, Modifier.weight(1f)) {
+                        onMenuClick("kategori")
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SimpleMenu("Supplier", Icons.Default.LocalShipping, Modifier.weight(1f)) {
+                        onMenuClick("supplier")
+                    }
+                    SimpleMenu("Brand / Merk", Icons.Default.BrandingWatermark, Modifier.weight(1f)) {
+                        onMenuClick("brand")
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SimpleMenu("Manajemen User", Icons.Default.People, Modifier.weight(1f)) {
+                        onMenuClick("users")
+                    }
+                    Box(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TransactionTab(onMenuClick: (String) -> Unit) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            Text(
+                "TRANSAKSI STOK IN & OUT",
+                color = TextPrimary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = 1.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                "Catat alur masuk dan keluar barang serta pantau riwayat aktivitas.",
+                color = TextSecondary,
+                fontSize = 12.sp
+            )
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SimpleMenu("Stok Masuk", Icons.Default.AddCircle, Modifier.weight(1f)) {
+                        onMenuClick("stok_masuk")
+                    }
+                    SimpleMenu("Stok Keluar", Icons.Default.RemoveCircle, Modifier.weight(1f)) {
+                        onMenuClick("stok_keluar")
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SimpleMenu("Riwayat Transaksi", Icons.Default.History, Modifier.weight(1f)) {
+                        onMenuClick("riwayat")
+                    }
+                    Box(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReportTab(
+    stats: com.example.smartinventory.data.model.DashboardStats?,
+    onMenuClick: (String) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            Text(
+                "MONITORING & LAPORAN",
+                color = TextPrimary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = 1.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                "Pantau ketersediaan barang secara realtime dan cetak laporan stok.",
+                color = TextSecondary,
+                fontSize = 12.sp
+            )
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SimpleMenu("Laporan Stok", Icons.Default.Assessment, Modifier.weight(1f)) {
+                        onMenuClick("laporan")
+                    }
+                    SimpleMenu("Monitoring Stok", Icons.Default.MonitorHeart, Modifier.weight(1f)) {
+                        onMenuClick("monitoring")
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SimpleMenu("Cari Barang", Icons.Default.Search, Modifier.weight(1f)) {
+                        onMenuClick("search")
+                    }
+                    SimpleMenu(
+                        title = "Notifikasi (" + (stats?.lowStockProducts?.size ?: 0) + ")",
+                        icon = Icons.Default.NotificationsActive,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        onMenuClick("monitoring")
+                    }
+                }
             }
         }
     }

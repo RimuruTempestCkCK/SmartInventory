@@ -12,7 +12,8 @@ if (empty($id) || empty($username)) {
 }
 
 if (!empty($password)) {
-    $query = "UPDATE users SET username = '$username', password = '$password', role = '$role' WHERE id = '$id'";
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    $query = "UPDATE users SET username = '$username', password = '$hashedPassword', role = '$role' WHERE id = '$id'";
 } else {
     $query = "UPDATE users SET username = '$username', role = '$role' WHERE id = '$id'";
 }

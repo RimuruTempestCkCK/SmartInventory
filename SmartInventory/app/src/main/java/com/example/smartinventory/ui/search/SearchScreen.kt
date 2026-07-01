@@ -73,8 +73,47 @@ fun SearchScreen(
         } else {
             LazyColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 items(filteredProducts) { product ->
-                    ProductItem(product, onEdit = {}, onDelete = {})
+                    SearchProductItem(product)
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchProductItem(product: com.example.smartinventory.data.model.Product) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = AppSurface),
+        elevation = CardDefaults.cardElevation(2.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, DividerColor)
+    ) {
+        Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Surface(
+                color = BrownAccent.copy(alpha = 0.2f),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.size(60.dp)
+            ) {
+                Icon(Icons.Default.Image, null, tint = BrownPrimary.copy(alpha = 0.5f), modifier = Modifier.padding(16.dp))
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(product.name, color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                Text(product.code, color = BrownPrimary, fontWeight = FontWeight.Medium, fontSize = 12.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Category, null, tint = TextSecondary, modifier = Modifier.size(12.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(product.categoryName ?: "-", color = TextSecondary, fontSize = 12.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(Icons.Default.BrandingWatermark, null, tint = TextSecondary, modifier = Modifier.size(12.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(product.brandName ?: "-", color = TextSecondary, fontSize = 12.sp)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Stok: ${product.stock} | Rak: ${product.shelfLocation ?: "-"}", color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text("Rp ${String.format("%,.0f", product.sellPrice)}", color = SuccessGreen, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
             }
         }
     }
