@@ -6,17 +6,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.smartinventory.ui.barang.ProductItem
+import com.example.smartinventory.data.model.Product
 import com.example.smartinventory.ui.barang.ProductViewModel
 import com.example.smartinventory.ui.theme.*
 
@@ -81,7 +81,7 @@ fun SearchScreen(
 }
 
 @Composable
-fun SearchProductItem(product: com.example.smartinventory.data.model.Product) {
+fun SearchProductItem(product: Product) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),

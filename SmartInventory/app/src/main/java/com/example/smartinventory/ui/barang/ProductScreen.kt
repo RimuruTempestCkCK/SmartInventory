@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -143,28 +145,40 @@ fun ProductScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = { Text(if (selectedProduct == null) "Tambah Barang" else "Edit Barang", color = TextPrimary, fontWeight = FontWeight.Bold) },
             text = {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    item { ProductField("Nama Barang", name) { name = it } }
-                    item { ProductField("Kode Barang", code) { code = it } }
+                val scrollState = rememberScrollState()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    ProductField("Nama Barang", name) { name = it }
+                    ProductField("Kode Barang", code) { code = it }
                     
-                    item {
-                        DropdownSelector("Pilih Kategori", selectedCatId, categories.map { it.id!! to it.name }) { selectedCatId = it }
-                    }
-                    item {
-                        DropdownSelector("Pilih Merk/Brand", selectedBrandId, brands.map { it.id!! to it.name }) { selectedBrandId = it }
-                    }
-                    item {
-                        DropdownSelector("Pilih Supplier", selectedSupplierId, suppliers.map { it.id!! to it.name }) { selectedSupplierId = it }
+                    DropdownSelector("Pilih Kategori", selectedCatId, categories.map { (it.id ?: "") to it.name }) { selectedCatId = it }
+                    DropdownSelector("Pilih Merk/Brand", selectedBrandId, brands.map { (it.id ?: "") to it.name }) { selectedBrandId = it }
+                    DropdownSelector("Pilih Supplier", selectedSupplierId, suppliers.map { (it.id ?: "") to it.name }) { selectedSupplierId = it }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            ProductField("Harga Beli", buyPrice) { buyPrice = it }
+                        }
+                        Box(modifier = Modifier.weight(1f)) {
+                            ProductField("Harga Jual", sellPrice) { sellPrice = it }
+                        }
                     }
 
-                    item { ProductField("Harga Beli", buyPrice) { buyPrice = it } }
-                    item { ProductField("Harga Jual", sellPrice) { sellPrice = it } }
-                    item { ProductField("Stok", stock) { stock = it } }
-                    item { ProductField("Lokasi Rak", rak) { rak = it } }
-                    item { ProductField("Warna", color) { color = it } }
-                    item {
-                        DropdownSelector("Kondisi", condition, listOf("Baru" to "Baru", "Second" to "Second")) { condition = it }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            ProductField("Stok", stock) { stock = it }
+                        }
+                        Box(modifier = Modifier.weight(1f)) {
+                            ProductField("Lokasi Rak", rak) { rak = it }
+                        }
                     }
+
+                    ProductField("Warna", color) { color = it }
+                    DropdownSelector("Kondisi", condition, listOf("Baru" to "Baru", "Second" to "Second")) { condition = it }
                 }
             },
             confirmButton = {
