@@ -1,17 +1,17 @@
 <?php
 require_once '../config.php';
 
-$id = $_POST['id_supplier'] ?? '';
+$id = $_POST['id'] ?? '';
 
-if (!empty($id)) {
-    $query = "DELETE FROM brands WHERE id = '$id'";
+if (empty($id)) {
+    echo json_encode(["status" => false, "message" => "ID wajib diisi"]);
+    exit;
+}
 
-    if (mysqli_query($conn, $query)) {
-        echo json_encode(["status" => true, "message" => "Merk berhasil dihapus"]);
-    } else {
-        echo json_encode(["status" => false, "message" => "Gagal hapus dari database"]);
-    }
+$query = "DELETE FROM suppliers WHERE id = '$id'";
+if (mysqli_query($conn, $query)) {
+    echo json_encode(["status" => true, "message" => "Supplier berhasil dihapus"]);
 } else {
-    echo json_encode(["status" => false, "message" => "ID tidak valid"]);
+    echo json_encode(["status" => false, "message" => "Gagal: " . mysqli_error($conn)]);
 }
 ?>

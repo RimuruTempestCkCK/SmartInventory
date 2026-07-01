@@ -12,114 +12,175 @@ interface ApiService {
         @Field("password") password: String
     ): Response<LoginResponse>
 
-    // Kategori
+    // Categories
     @GET("kategori/get.php")
     suspend fun getCategories(): Response<List<Category>>
 
     @FormUrlEncoded
     @POST("kategori/insert.php")
     suspend fun insertCategory(
-        @Field("nama_kategori") name: String
+        @Field("name") name: String
     ): Response<BaseResponse>
 
     @FormUrlEncoded
     @POST("kategori/update.php")
     suspend fun updateCategory(
-        @Field("id_kategori") id: String,
-        @Field("nama_kategori") name: String
+        @Field("id") id: String,
+        @Field("name") name: String
     ): Response<BaseResponse>
 
     @FormUrlEncoded
     @POST("kategori/delete.php")
     suspend fun deleteCategory(
-        @Field("id_kategori") id: String
+        @Field("id") id: String
     ): Response<BaseResponse>
 
-    // Supplier
+    // Brands
+    @GET("brand/get.php")
+    suspend fun getBrands(): Response<List<Brand>>
+
+    @FormUrlEncoded
+    @POST("brand/insert.php")
+    suspend fun insertBrand(
+        @Field("name") name: String
+    ): Response<BaseResponse>
+
+    @FormUrlEncoded
+    @POST("brand/update.php")
+    suspend fun updateBrand(
+        @Field("id") id: String,
+        @Field("name") name: String
+    ): Response<BaseResponse>
+
+    @FormUrlEncoded
+    @POST("brand/delete.php")
+    suspend fun deleteBrand(
+        @Field("id") id: String
+    ): Response<BaseResponse>
+
+    // Suppliers
     @GET("supplier/get.php")
     suspend fun getSuppliers(): Response<List<Supplier>>
 
     @FormUrlEncoded
     @POST("supplier/insert.php")
     suspend fun insertSupplier(
-        @Field("nama_supplier") name: String,
-        @Field("alamat") address: String,
-        @Field("no_hp") phone: String
+        @Field("name") name: String,
+        @Field("address") address: String,
+        @Field("phone") phone: String
     ): Response<BaseResponse>
 
     @FormUrlEncoded
     @POST("supplier/update.php")
     suspend fun updateSupplier(
-        @Field("id_supplier") id: String,
-        @Field("nama_supplier") name: String,
-        @Field("alamat") address: String,
-        @Field("no_hp") phone: String
+        @Field("id") id: String,
+        @Field("name") name: String,
+        @Field("address") address: String,
+        @Field("phone") phone: String
     ): Response<BaseResponse>
 
     @FormUrlEncoded
     @POST("supplier/delete.php")
     suspend fun deleteSupplier(
-        @Field("id_supplier") id: String
+        @Field("id") id: String
     ): Response<BaseResponse>
 
-    // Barang
+    // Products
     @GET("barang/get.php")
     suspend fun getProducts(): Response<List<Product>>
 
     @FormUrlEncoded
     @POST("barang/insert.php")
     suspend fun insertProduct(
-        @Field("kode_barang") code: String,
-        @Field("nama_barang") name: String,
-        @Field("id_kategori") categoryId: String,
-        @Field("id_supplier") supplierId: String,
-        @Field("harga") price: Double,
-        @Field("stok") stock: Int
+        @Field("code") code: String,
+        @Field("name") name: String,
+        @Field("category_id") categoryId: String,
+        @Field("brand_id") brandId: String,
+        @Field("supplier_id") supplierId: String,
+        @Field("buy_price") buyPrice: Double,
+        @Field("sell_price") sellPrice: Double,
+        @Field("stok") stock: Int,
+        @Field("lokasi_rak") shelfLocation: String,
+        @Field("warna") color: String,
+        @Field("kondisi") condition: String
     ): Response<BaseResponse>
 
     @FormUrlEncoded
     @POST("barang/update.php")
     suspend fun updateProduct(
-        @Field("id_barang") id: String,
-        @Field("kode_barang") code: String,
-        @Field("nama_barang") name: String,
-        @Field("id_kategori") categoryId: String,
-        @Field("id_supplier") supplierId: String,
-        @Field("harga") price: Double,
-        @Field("stok") stock: Int
+        @Field("id") id: String,
+        @Field("code") code: String,
+        @Field("name") name: String,
+        @Field("category_id") categoryId: String,
+        @Field("brand_id") brandId: String,
+        @Field("supplier_id") supplierId: String,
+        @Field("buy_price") buyPrice: Double,
+        @Field("sell_price") sellPrice: Double,
+        @Field("stok") stock: Int,
+        @Field("lokasi_rak") shelfLocation: String,
+        @Field("warna") color: String,
+        @Field("kondisi") condition: String
     ): Response<BaseResponse>
 
     @FormUrlEncoded
     @POST("barang/delete.php")
     suspend fun deleteProduct(
-        @Field("id_barang") id: String
+        @Field("id") id: String
     ): Response<BaseResponse>
 
-    // Stok
+    // Transactions / Stok
     @FormUrlEncoded
     @POST("stok/masuk.php")
     suspend fun stockIn(
-        @Field("id_barang") productId: String,
-        @Field("jumlah") quantity: Int,
-        @Field("tanggal") date: String,
-        @Field("keterangan") info: String
+        @Field("product_id") productId: String,
+        @Field("qty") quantity: Int,
+        @Field("date") date: String,
+        @Field("description") description: String
     ): Response<BaseResponse>
 
     @FormUrlEncoded
     @POST("stok/keluar.php")
     suspend fun stockOut(
-        @Field("id_barang") productId: String,
-        @Field("jumlah") quantity: Int,
-        @Field("tanggal") date: String
+        @Field("product_id") productId: String,
+        @Field("qty") quantity: Int,
+        @Field("date") date: String,
+        @Field("description") description: String
     ): Response<BaseResponse>
 
     @GET("stok/history.php")
     suspend fun getHistory(): Response<List<Transaction>>
 
-    // Dashboard & Prediksi
+    // Dashboard & Predictions
     @GET("dashboard.php")
     suspend fun getDashboardStats(): Response<DashboardStats>
 
     @GET("prediksi.php")
     suspend fun getPrediction(): Response<PredictionResponse>
+
+    // Users
+    @GET("users/get.php")
+    suspend fun getUsers(): Response<List<User>>
+
+    @FormUrlEncoded
+    @POST("users/insert.php")
+    suspend fun insertUser(
+        @Field("username") username: String,
+        @Field("password") password: String,
+        @Field("role") role: String
+    ): Response<BaseResponse>
+
+    @FormUrlEncoded
+    @POST("users/update.php")
+    suspend fun updateUser(
+        @Field("id") id: String,
+        @Field("username") username: String,
+        @Field("password") password: String,
+        @Field("role") role: String
+    ): Response<BaseResponse>
+
+    @FormUrlEncoded
+    @POST("users/delete.php")
+    suspend fun deleteUser(
+        @Field("id") id: String
+    ): Response<BaseResponse>
 }

@@ -34,7 +34,7 @@ fun LoginScreen(
             val user = (loginState as LoginResult.Success).response.user
             if (user != null) {
                 prefManager.saveLoginStatus(true)
-                prefManager.saveUser(user.id ?: "", user.username, user.name ?: "", user.level ?: "")
+                prefManager.saveUser(user.id ?: "", user.username, user.role ?: "staff")
                 onLoginSuccess()
             }
         }

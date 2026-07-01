@@ -1,7 +1,7 @@
 <?php
 require_once '../config.php';
 
-$query = "SELECT * FROM categories ORDER BY name ASC";
+$query = "SELECT id, username, role FROM users ORDER BY username ASC";
 $result = mysqli_query($conn, $query);
 
 $data = [];

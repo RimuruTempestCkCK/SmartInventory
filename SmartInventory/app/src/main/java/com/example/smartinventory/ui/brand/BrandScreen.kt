@@ -1,16 +1,11 @@
-package com.example.smartinventory.ui.kategori
+package com.example.smartinventory.ui.brand
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,29 +15,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.smartinventory.data.model.Category
+import com.example.smartinventory.data.model.Brand
 import com.example.smartinventory.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoryScreen(
+fun BrandScreen(
     onBack: () -> Unit,
-    viewModel: CategoryViewModel = viewModel()
+    viewModel: BrandViewModel = viewModel()
 ) {
-    val categories by viewModel.categories.collectAsState()
+    val brands by viewModel.brands.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val message by viewModel.message.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     var showDialog by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf<Category?>(null) }
-    var categoryName by remember { mutableStateOf("") }
+    var selectedBrand by remember { mutableStateOf<Brand?>(null) }
+    var brandName by remember { mutableStateOf("") }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("KATEGORI BARANG", fontWeight = FontWeight.ExtraBold, color = Color.White) },
+                title = { Text("DATA BRAND / MERK", fontWeight = FontWeight.ExtraBold, color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
@@ -56,36 +51,36 @@ fun CategoryScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    selectedCategory = null
-                    categoryName = ""
+                    selectedBrand = null
+                    brandName = ""
                     showDialog = true
                 },
                 containerColor = BrownPrimary,
                 contentColor = Color.White,
                 icon = { Icon(Icons.Default.Add, null) },
-                text = { Text("Kategori Baru") }
+                text = { Text("Brand Baru") }
             )
         },
         containerColor = AppBackground
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            if (isLoading && categories.isEmpty()) {
+            if (isLoading && brands.isEmpty()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = BrownPrimary)
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(categories) { category ->
-                        CategoryItem(
-                            category = category,
+                    items(brands) { brand ->
+                        BrandItem(
+                            brand = brand,
                             onEdit = {
-                                selectedCategory = category
-                                categoryName = category.name
+                                selectedBrand = brand
+                                brandName = brand.name
                                 showDialog = true
                             },
                             onDelete = {
-                                viewModel.removeCategory(category.id ?: "")
+                                viewModel.removeBrand(brand.id ?: "")
                             }
                         )
                     }
@@ -100,43 +95,33 @@ fun CategoryScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
-                    if (selectedCategory == null) "Tambah Kategori" else "Edit Kategori",
+                    if (selectedBrand == null) "Tambah Brand" else "Edit Brand",
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 OutlinedTextField(
-                    value = categoryName,
-                    onValueChange = { categoryName = it },
-                    label = { Text("Nama Kategori", color = TextSecondary) },
+                    value = brandName,
+                    onValueChange = { brandName = it },
+                    label = { Text("Nama Brand", color = TextSecondary) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary,
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = Color.Gray
-                    )
+                    shape = RoundedCornerShape(12.dp)
                 )
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        if (selectedCategory == null) {
-                            viewModel.addCategory(categoryName)
+                        if (selectedBrand == null) {
+                            viewModel.addBrand(brandName)
                         } else {
-                            viewModel.editCategory(selectedCategory!!.id!!, categoryName)
+                            viewModel.editBrand(selectedBrand!!.id!!, brandName)
                         }
                         showDialog = false
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Save")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text("Cancel", color = Color.Gray)
+                    Text("Simpan")
                 }
             }
         )
@@ -151,11 +136,7 @@ fun CategoryScreen(
 }
 
 @Composable
-fun CategoryItem(
-    category: Category,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
-) {
+fun BrandItem(brand: Brand, onEdit: () -> Unit, onDelete: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -173,23 +154,19 @@ fun CategoryItem(
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.size(44.dp)
             ) {
-                Icon(Icons.Default.Category, null, tint = BrownPrimary, modifier = Modifier.padding(10.dp))
+                Icon(Icons.Default.BrandingWatermark, null, tint = BrownPrimary, modifier = Modifier.padding(10.dp))
             }
             Spacer(modifier = Modifier.width(16.dp))
             Text(
-                category.name,
+                brand.name,
                 color = TextPrimary,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.weight(1f)
             )
             Row {
-                IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownPrimary)
-                }
-                IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = ErrorRed.copy(alpha = 0.7f))
-                }
+                IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownPrimary) }
+                IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, contentDescription = "Delete", tint = ErrorRed.copy(alpha = 0.7f)) }
             }
         }
     }

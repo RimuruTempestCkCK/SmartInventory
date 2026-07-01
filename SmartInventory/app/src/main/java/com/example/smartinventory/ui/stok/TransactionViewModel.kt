@@ -67,11 +67,11 @@ class TransactionViewModel : ViewModel() {
         }
     }
 
-    fun addStockOut(productId: String, qty: Int, date: String) {
+    fun addStockOut(productId: String, qty: Int, date: String, info: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val response = RetrofitClient.instance.stockOut(productId, qty, date)
+                val response = RetrofitClient.instance.stockOut(productId, qty, date, info)
                 if (response.isSuccessful && response.body()?.status == true) {
                     _message.value = "Stock Out recorded"
                     fetchHistory()

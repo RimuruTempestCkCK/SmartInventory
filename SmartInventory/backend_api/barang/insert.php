@@ -1,28 +1,29 @@
 <?php
 require_once '../config.php';
 
-// Database menggunakan string (Varchar) untuk Merk dan Kategori.
-// Android mengirimkan 'id_kategori' dan 'id_supplier' sebagai string nama.
-
-$kode = $_POST['kode_barang'] ?? '';
-$nama = $_POST['nama_barang'] ?? '';
-$kategori = $_POST['id_kategori'] ?? ''; // Berisi nama Rak dari UI
-$merk = $_POST['id_supplier'] ?? '';     // Berisi nama Merk dari UI
-$harga = $_POST['harga'] ?? 0;
+$code = $_POST['code'] ?? '';
+$name = $_POST['name'] ?? '';
+$category_id = $_POST['category_id'] ?? null;
+$brand_id = $_POST['brand_id'] ?? null;
+$supplier_id = $_POST['supplier_id'] ?? null;
+$buy_price = $_POST['buy_price'] ?? 0;
+$sell_price = $_POST['sell_price'] ?? 0;
 $stok = $_POST['stok'] ?? 0;
+$lokasi_rak = $_POST['lokasi_rak'] ?? '';
+$warna = $_POST['warna'] ?? '';
+$kondisi = $_POST['kondisi'] ?? 'Baru';
 
-if (!empty($nama) && !empty($kode)) {
-    // Karena kolom di database 'products' adalah (merk, nama_barang, kategori, harga_beli, harga_jual, stok, rak)
-    // Kita set harga_beli dan harga_jual sama sesuai input 'harga' dari Android.
-    $query = "INSERT INTO products (merk, nama_barang, kategori, harga_beli, harga_jual, stok, rak)
-              VALUES ('$merk', '$nama', '$kategori', '$harga', '$harga', '$stok', '$kode')";
+if (empty($code) || empty($name)) {
+    echo json_encode(["status" => false, "message" => "Kode dan Nama barang wajib diisi"]);
+    exit;
+}
 
-    if (mysqli_query($conn, $query)) {
-        echo json_encode(["status" => true, "message" => "Barang '$nama' berhasil ditambahkan ke database"]);
-    } else {
-        echo json_encode(["status" => false, "message" => "Gagal Database: " . mysqli_error($conn)]);
-    }
+$query = "INSERT INTO products (code, name, category_id, brand_id, supplier_id, buy_price, sell_price, stok, lokasi_rak, warna, kondisi)
+          VALUES ('$code', '$name', '$category_id', '$brand_id', '$supplier_id', '$buy_price', '$sell_price', '$stok', '$lokasi_rak', '$warna', '$kondisi')";
+
+if (mysqli_query($conn, $query)) {
+    echo json_encode(["status" => true, "message" => "Produk berhasil ditambahkan"]);
 } else {
-    echo json_encode(["status" => false, "message" => "Data tidak lengkap (Nama & Kode wajib diisi)"]);
+    echo json_encode(["status" => false, "message" => "Gagal menambahkan produk: " . mysqli_error($conn)]);
 }
 ?>

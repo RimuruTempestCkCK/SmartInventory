@@ -1,18 +1,19 @@
 <?php
 require_once '../config.php';
 
-$nama = $_POST['nama_supplier'] ?? '';
+$name = $_POST['name'] ?? '';
+$address = $_POST['address'] ?? '';
+$phone = $_POST['phone'] ?? '';
 
-if (!empty($nama)) {
-    // Di database Anda, Supplier dan Kategori sama-sama masuk ke tabel 'brands'
-    $query = "INSERT INTO brands (name) VALUES ('$nama')";
+if (empty($name)) {
+    echo json_encode(["status" => false, "message" => "Nama supplier wajib diisi"]);
+    exit;
+}
 
-    if (mysqli_query($conn, $query)) {
-        echo json_encode(["status" => true, "message" => "Merk '$nama' berhasil ditambahkan"]);
-    } else {
-        echo json_encode(["status" => false, "message" => "Gagal insert ke database"]);
-    }
+$query = "INSERT INTO suppliers (name, address, phone) VALUES ('$name', '$address', '$phone')";
+if (mysqli_query($conn, $query)) {
+    echo json_encode(["status" => true, "message" => "Supplier berhasil ditambahkan"]);
 } else {
-    echo json_encode(["status" => false, "message" => "Nama merk wajib diisi"]);
+    echo json_encode(["status" => false, "message" => "Gagal: " . mysqli_error($conn)]);
 }
 ?>

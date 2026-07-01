@@ -2,8 +2,7 @@ package com.example.smartinventory.data.model
 
 import com.google.gson.annotations.SerializedName
 
-data class User(
+data class Brand(
     @SerializedName("id") val id: String?,
-    @SerializedName("username") val username: String,
-    @SerializedName("role") val role: String? // "admin" or "staff"
+    @SerializedName("name") val name: String
 )

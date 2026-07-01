@@ -33,6 +33,7 @@ fun StockOutScreen(
     
     var selectedProductId by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
+    var info by remember { mutableStateOf("") }
     
     val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
@@ -40,30 +41,62 @@ fun StockOutScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("STOCK OUT", fontWeight = FontWeight.ExtraBold) },
+                title = { Text("STOK KELUAR", fontWeight = FontWeight.ExtraBold, color = Color.White) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back", tint = Color.White) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, titleContentColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = BrownPrimary)
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showDialog = true }, containerColor = ErrorRed, contentColor = Color.White) {
-                Icon(Icons.Default.RemoveCircle, "Add Stock Out")
-            }
+            ExtendedFloatingActionButton(
+                onClick = {
+                    selectedProductId = ""
+                    quantity = ""
+                    info = ""
+                    showDialog = true
+                },
+                containerColor = ErrorRed,
+                contentColor = Color.White,
+                icon = { Icon(Icons.Default.RemoveCircle, null) },
+                text = { Text("Input Stok Keluar") }
+            )
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = AppBackground
     ) { padding ->
         val history by viewModel.history.collectAsState()
-        val stockOutHistory = history.filter { it.type == "Keluar" }
+        val stockOutHistory = history.filter { it.type == "out" }
 
-        LazyColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(stockOutHistory) { item ->
-                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
-                    Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Column {
-                            Text(item.productName ?: "Unknown", color = TextPrimary, fontWeight = FontWeight.Bold)
-                            Text(item.date, color = TextSecondary, fontSize = 12.sp)
+        if (stockOutHistory.isEmpty()) {
+            Box(modifier = Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Belum ada riwayat stok keluar", color = TextSecondary)
+            }
+        } else {
+            LazyColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                items(stockOutHistory) { item ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = AppSurface),
+                        elevation = CardDefaults.cardElevation(2.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, DividerColor)
+                    ) {
+                        Row(modifier = Modifier.padding(20.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Surface(
+                                color = ErrorRed.copy(alpha = 0.1f),
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(Icons.Default.RemoveCircle, null, tint = ErrorRed, modifier = Modifier.padding(12.dp))
+                            }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(item.productName ?: "Produk Terhapus", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                                Text(item.date, color = TextSecondary, fontSize = 12.sp)
+                                if (!item.description.isNullOrEmpty()) {
+                                    Text(item.description, color = TextSecondary, fontSize = 11.sp, maxLines = 1)
+                                }
+                            }
+                            Text("-${item.quantity}", color = ErrorRed, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
                         }
-                        Text("-${item.quantity}", color = ErrorRed, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
                 }
             }
@@ -73,28 +106,54 @@ fun StockOutScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            containerColor = MaterialTheme.colorScheme.surface,
-            title = { Text("New Stock Out", color = TextPrimary, fontWeight = FontWeight.Bold) },
+            containerColor = AppSurface,
+            title = { Text("Input Stok Keluar Baru", color = TextPrimary, fontWeight = FontWeight.ExtraBold) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Select Product", color = TextSecondary)
-                    products.forEach { p ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(selected = selectedProductId == p.id, onClick = { selectedProductId = p.id ?: "" })
-                            Text("${p.name} (Stok: ${p.stock})", color = TextPrimary)
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    var expanded by remember { mutableStateOf(false) }
+                    val selectedProduct = products.find { it.id == selectedProductId }
+                    val selectedProductName = selectedProduct?.let { "${it.name} (Sisa: ${it.stock})" } ?: "Pilih Produk"
+
+                    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+                        OutlinedTextField(
+                            value = selectedProductName, onValueChange = {}, readOnly = true,
+                            label = { Text("Produk") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            modifier = Modifier.menuAnchor().fillMaxWidth(),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                        )
+                        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                            products.forEach { p ->
+                                DropdownMenuItem(
+                                    text = { Text("${p.name} (Stok: ${p.stock})") },
+                                    onClick = { selectedProductId = p.id ?: ""; expanded = false }
+                                )
+                            }
                         }
                     }
+
                     OutlinedTextField(
-                        value = quantity, onValueChange = { quantity = it }, label = { Text("Quantity", color = TextSecondary) },
-                        modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary)
+                        value = quantity, onValueChange = { quantity = it }, label = { Text("Jumlah (Qty)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                    )
+                    OutlinedTextField(
+                        value = info, onValueChange = { info = it }, label = { Text("Keterangan") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
                     )
                 }
             },
             confirmButton = {
-                Button(onClick = {
-                    viewModel.addStockOut(selectedProductId, quantity.toIntOrNull() ?: 0, date)
-                    showDialog = false
-                }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) { Text("Save") }
+                Button(
+                    onClick = {
+                        viewModel.addStockOut(selectedProductId, quantity.toIntOrNull() ?: 0, date, info)
+                        showDialog = false
+                    },
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
+                ) { Text("KURANGI STOK") }
             }
         )
     }

@@ -3,11 +3,11 @@ package com.example.smartinventory.data.model
 import com.google.gson.annotations.SerializedName
 
 data class Transaction(
-    @SerializedName("id_transaksi") val id: String?,
-    @SerializedName("id_barang") val productId: String,
-    @SerializedName("nama_barang") val productName: String?,
-    @SerializedName("tanggal") val date: String,
-    @SerializedName("jumlah") val quantity: Int,
-    @SerializedName("jenis") val type: String, // "Masuk" or "Keluar"
-    @SerializedName("keterangan") val info: String?
+    @SerializedName("id") val id: String?,
+    @SerializedName("product_id") val productId: String,
+    @SerializedName("product_name") val productName: String?,
+    @SerializedName("type") val type: String, // "in", "out", "reject"
+    @SerializedName("qty") val quantity: Int,
+    @SerializedName("date") val date: String,
+    @SerializedName("description") val description: String?
 )

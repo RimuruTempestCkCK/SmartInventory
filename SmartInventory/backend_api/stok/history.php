@@ -1,22 +1,22 @@
 <?php
 require_once '../config.php';
 
-$query = "SELECT t.*, b.nama_barang
+$query = "SELECT t.*, p.name as product_name
           FROM transactions t
-          JOIN products b ON t.product_id = b.id
-          ORDER BY t.id DESC";
+          JOIN products p ON t.product_id = p.id
+          ORDER BY t.date DESC, t.id DESC";
 $result = mysqli_query($conn, $query);
 
 $data = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $data[] = [
-        "id_transaksi" => $row['id'],
-        "id_barang" => $row['product_id'],
-        "nama_barang" => $row['nama_barang'],
-        "tanggal" => $row['tanggal'],
-        "jumlah" => $row['qty'],
-        "jenis" => ucfirst($row['type']), // 'masuk' -> 'Masuk'
-        "keterangan" => $row['keterangan']
+        "id" => $row['id'],
+        "product_id" => $row['product_id'],
+        "product_name" => $row['product_name'],
+        "type" => $row['type'],
+        "qty" => (int)$row['qty'],
+        "date" => $row['date'],
+        "description" => $row['description']
     ];
 }
 

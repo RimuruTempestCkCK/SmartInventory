@@ -204,3 +204,12 @@ Prediksi Naive Bayes
 17. Testing.
 18. Bug fixing.
 19. Finalisasi source code.
+
+---
+**STATUS UPDATE (7/1/2026):**
+Database refactoring completed. All Android models, API services, and backend PHP scripts are now synchronized with the `db_inventory_aksesoris` schema.
+- Separate `brands` and `categories` tables implemented.
+- Product model updated with full relational support (category_id, brand_id, supplier_id).
+- Transaction logic updated to `in`/`out`/`reject`.
+- Naive Bayes logic updated for new transaction types.
+

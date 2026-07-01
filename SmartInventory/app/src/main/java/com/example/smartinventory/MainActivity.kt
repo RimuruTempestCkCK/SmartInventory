@@ -11,15 +11,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.smartinventory.preference.PreferenceManager
 import com.example.smartinventory.ui.barang.ProductScreen
+import com.example.smartinventory.ui.brand.BrandScreen
 import com.example.smartinventory.ui.dashboard.DashboardScreen
 import com.example.smartinventory.ui.kategori.CategoryScreen
 import com.example.smartinventory.ui.login.LoginScreen
+import com.example.smartinventory.ui.monitoring.MonitoringScreen
 import com.example.smartinventory.ui.prediksi.PredictionScreen
 import com.example.smartinventory.ui.report.ReportScreen
+import com.example.smartinventory.ui.search.SearchScreen
 import com.example.smartinventory.ui.stok.HistoryScreen
 import com.example.smartinventory.ui.stok.StockInScreen
 import com.example.smartinventory.ui.stok.StockOutScreen
 import com.example.smartinventory.ui.supplier.SupplierScreen
+import com.example.smartinventory.ui.users.UserManagementScreen
 import com.example.smartinventory.ui.theme.SmartInventoryTheme
 
 class MainActivity : ComponentActivity() {
@@ -73,5 +77,9 @@ fun AppNavigation() {
         composable("riwayat") { HistoryScreen(onBack = { navController.popBackStack() }) }
         composable("prediksi") { PredictionScreen(onBack = { navController.popBackStack() }) }
         composable("laporan") { ReportScreen(onBack = { navController.popBackStack() }) }
+        composable("brand") { BrandScreen(onBack = { navController.popBackStack() }) }
+        composable("monitoring") { MonitoringScreen(onBack = { navController.popBackStack() }) }
+        composable("search") { SearchScreen(onBack = { navController.popBackStack() }) }
+        composable("users") { UserManagementScreen(onBack = { navController.popBackStack() }) }
     }
 }

@@ -1,8 +1,7 @@
 <?php
 require_once '../config.php';
 
-// Menggunakan tabel 'brands' sebagai pengganti supplier
-$query = "SELECT id as id_supplier, name as nama_supplier, '' as alamat, '' as no_hp FROM brands ORDER BY id DESC";
+$query = "SELECT * FROM suppliers ORDER BY name ASC";
 $result = mysqli_query($conn, $query);
 
 $data = [];

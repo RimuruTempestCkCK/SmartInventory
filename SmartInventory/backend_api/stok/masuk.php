@@ -1,29 +1,30 @@
 <?php
 require_once '../config.php';
 
-$id_barang = $_POST['id_barang'] ?? '';
-$jumlah = $_POST['jumlah'] ?? 0;
-$tanggal = $_POST['tanggal'] ?? date('Y-m-d');
-$keterangan = $_POST['keterangan'] ?? '';
+$product_id = $_POST['product_id'] ?? '';
+$qty = $_POST['qty'] ?? 0;
+$date = $_POST['date'] ?? date('Y-m-d');
+$description = $_POST['description'] ?? '';
 
-if (!empty($id_barang) && $jumlah > 0) {
-    mysqli_begin_transaction($conn);
+if (empty($product_id) || $qty <= 0) {
+    echo json_encode(["status" => false, "message" => "Produk dan jumlah harus valid"]);
+    exit;
+}
 
-    // Menggunakan tabel 'transactions' sesuai database lama Anda
-    $q1 = "INSERT INTO transactions (product_id, tanggal, qty, type, keterangan)
-           VALUES ('$id_barang', '$tanggal', '$jumlah', 'masuk', '$keterangan')";
+mysqli_begin_transaction($conn);
 
-    // Update stok di tabel 'products'
-    $q2 = "UPDATE products SET stok = stok + $jumlah WHERE id = '$id_barang'";
+try {
+    $q1 = "INSERT INTO transactions (product_id, type, qty, date, description) VALUES ('$product_id', 'in', '$qty', '$date', '$description')";
+    $q2 = "UPDATE products SET stok = stok + $qty WHERE id = '$product_id'";
 
     if (mysqli_query($conn, $q1) && mysqli_query($conn, $q2)) {
         mysqli_commit($conn);
         echo json_encode(["status" => true, "message" => "Stok masuk berhasil dicatat"]);
     } else {
-        mysqli_rollback($conn);
-        echo json_encode(["status" => false, "message" => "Gagal mencatat stok masuk"]);
+        throw new Exception(mysqli_error($conn));
     }
-} else {
-    echo json_encode(["status" => false, "message" => "Data tidak valid"]);
+} catch (Exception $e) {
+    mysqli_rollback($conn);
+    echo json_encode(["status" => false, "message" => "Gagal mencatat stok masuk: " . $e->getMessage()]);
 }
 ?>

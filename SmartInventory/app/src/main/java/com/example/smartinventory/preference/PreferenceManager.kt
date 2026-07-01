@@ -14,12 +14,11 @@ class PreferenceManager(context: Context) {
         return prefs.getBoolean("is_logged_in", false)
     }
 
-    fun saveUser(id: String, username: String, name: String, level: String) {
+    fun saveUser(id: String, username: String, role: String) {
         prefs.edit().apply {
             putString("user_id", id)
             putString("username", username)
-            putString("name", name)
-            putString("level", level)
+            putString("role", role)
             apply()
         }
     }
@@ -29,5 +28,5 @@ class PreferenceManager(context: Context) {
     }
 
     fun getUsername(): String? = prefs.getString("username", "")
-    fun getName(): String? = prefs.getString("name", "")
+    fun getRole(): String? = prefs.getString("role", "staff")
 }

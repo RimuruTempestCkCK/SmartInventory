@@ -1,7 +1,7 @@
 <?php
 require_once '../config.php';
 
-$query = "SELECT * FROM categories ORDER BY name ASC";
+$query = "SELECT * FROM brands ORDER BY name ASC";
 $result = mysqli_query($conn, $query);
 
 $data = [];

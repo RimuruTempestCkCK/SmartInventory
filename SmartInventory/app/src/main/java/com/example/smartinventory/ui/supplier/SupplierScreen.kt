@@ -40,20 +40,19 @@ fun SupplierScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("MERK & BRAND", fontWeight = FontWeight.ExtraBold) },
+                title = { Text("DATA SUPPLIER", fontWeight = FontWeight.ExtraBold, color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
+                    containerColor = BrownPrimary
                 )
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = {
                     selectedSupplier = null
                     name = ""
@@ -61,21 +60,21 @@ fun SupplierScreen(
                     phone = ""
                     showDialog = true
                 },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Tambah Merk")
-            }
+                containerColor = BrownPrimary,
+                contentColor = Color.White,
+                icon = { Icon(Icons.Default.Add, null) },
+                text = { Text("Supplier Baru") }
+            )
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = AppBackground
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             if (isLoading && suppliers.isEmpty()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = MaterialTheme.colorScheme.primary)
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = BrownPrimary)
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(suppliers) { supplier ->
                         SupplierItem(
@@ -103,7 +102,7 @@ fun SupplierScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
-                    if (selectedSupplier == null) "Tambah Merk/Brand" else "Edit Merk/Brand",
+                    if (selectedSupplier == null) "Tambah Supplier" else "Edit Supplier",
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold
                 )
@@ -113,7 +112,7 @@ fun SupplierScreen(
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Nama Merk", color = TextSecondary) },
+                        label = { Text("Nama Supplier", color = TextSecondary) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = TextPrimary,
@@ -125,7 +124,7 @@ fun SupplierScreen(
                     OutlinedTextField(
                         value = address,
                         onValueChange = { address = it },
-                        label = { Text("Keterangan", color = TextSecondary) },
+                        label = { Text("Alamat", color = TextSecondary) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = TextPrimary,
@@ -137,7 +136,7 @@ fun SupplierScreen(
                     OutlinedTextField(
                         value = phone,
                         onValueChange = { phone = it },
-                        label = { Text("Kontak (Opsional)", color = TextSecondary) },
+                        label = { Text("Nomor HP", color = TextSecondary) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = TextPrimary,
@@ -187,26 +186,43 @@ fun SupplierItem(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = AppSurface),
+        elevation = CardDefaults.cardElevation(2.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, DividerColor)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier.padding(20.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            Surface(
+                color = BrownPrimary.copy(alpha = 0.1f),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.size(50.dp)
+            ) {
+                Icon(Icons.Default.LocalShipping, null, tint = BrownPrimary, modifier = Modifier.padding(12.dp))
+            }
+            Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(supplier.name, color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(supplier.phone ?: "-", color = TextSecondary, fontSize = 14.sp)
-                Text(supplier.address ?: "-", color = TextSecondary, fontSize = 12.sp)
+                Text(supplier.name, color = TextPrimary, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Phone, null, tint = TextSecondary, modifier = Modifier.size(12.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(supplier.phone ?: "-", color = TextSecondary, fontSize = 13.sp)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.LocationOn, null, tint = TextSecondary, modifier = Modifier.size(12.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(supplier.address ?: "-", color = TextSecondary, fontSize = 12.sp)
+                }
             }
             Row {
                 IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownSecondary)
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownPrimary)
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = ErrorRed)
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = ErrorRed.copy(alpha = 0.7f))
                 }
             }
         }
