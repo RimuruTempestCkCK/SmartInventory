@@ -31,15 +31,17 @@ fun CategoryScreen(
     val categories by viewModel.categories.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val message by viewModel.message.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var showDialog by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
     var categoryName by remember { mutableStateOf("") }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("CATEGORIES", fontWeight = FontWeight.ExtraBold) },
+                title = { Text("LOKASI RAK", fontWeight = FontWeight.ExtraBold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
@@ -61,7 +63,7 @@ fun CategoryScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Category")
+                Icon(Icons.Default.Add, contentDescription = "Tambah Rak")
             }
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -98,7 +100,7 @@ fun CategoryScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
-                    if (selectedCategory == null) "Add Category" else "Edit Category",
+                    if (selectedCategory == null) "Tambah Rak" else "Edit Rak",
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold
                 )
@@ -107,7 +109,7 @@ fun CategoryScreen(
                 OutlinedTextField(
                     value = categoryName,
                     onValueChange = { categoryName = it },
-                    label = { Text("Category Name", color = TextSecondary) },
+                    label = { Text("Nama Rak / Kode Lokasi", color = TextSecondary) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = TextPrimary,
@@ -142,7 +144,7 @@ fun CategoryScreen(
 
     LaunchedEffect(message) {
         message?.let {
-            // In a real app, use a Snackbar
+            snackbarHostState.showSnackbar(it)
             viewModel.clearMessage()
         }
     }

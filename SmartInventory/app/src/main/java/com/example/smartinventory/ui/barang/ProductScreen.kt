@@ -42,11 +42,22 @@ fun ProductScreen(
     var price by remember { mutableStateOf("") }
     var stock by remember { mutableStateOf("") }
 
+    val message by viewModel.message.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val filteredProducts = products.filter { 
         it.name.contains(searchQuery, ignoreCase = true) || it.code.contains(searchQuery, ignoreCase = true)
     }
 
+    LaunchedEffect(message) {
+        message?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearMessage()
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
                 TopAppBar(
@@ -108,13 +119,13 @@ fun ProductScreen(
                     item { ProductField("Nama Barang", name) { name = it } }
                     item { ProductField("Kode Rak", code) { code = it } }
                     
-                    // Dropdown untuk Kategori
+                    // Dropdown untuk Kategori (Rak)
                     item {
                         var expanded by remember { mutableStateOf(false) }
                         ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
                             OutlinedTextField(
                                 value = catName, onValueChange = {}, readOnly = true,
-                                label = { Text("Pilih Kategori") },
+                                label = { Text("Pilih Lokasi Rak") },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                                 modifier = Modifier.menuAnchor().fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp)
@@ -136,7 +147,7 @@ fun ProductScreen(
                         ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
                             OutlinedTextField(
                                 value = supName, onValueChange = {}, readOnly = true,
-                                label = { Text("Pilih Merk/Brand") },
+                                label = { Text("Pilih Merk / Brand") },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                                 modifier = Modifier.menuAnchor().fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp)
@@ -160,8 +171,14 @@ fun ProductScreen(
                 Button(onClick = {
                     val p = price.toDoubleOrNull() ?: 0.0
                     val s = stock.toIntOrNull() ?: 0
-                    if (selectedProduct == null) viewModel.addProduct(code, name, catName, supName, p, s)
-                    else viewModel.editProduct(selectedProduct!!.id!!, code, name, catName, supName, p, s)
+                    
+                    // Backend Anda menggunakan String (Varchar) untuk Merk dan Kategori.
+                    // Jadi kita kirimkan Nama-nya langsung, bukan ID angkanya.
+                    if (selectedProduct == null) {
+                        viewModel.addProduct(code, name, catName, supName, p, s)
+                    } else {
+                        viewModel.editProduct(selectedProduct!!.id!!, code, name, catName, supName, p, s)
+                    }
                     showDialog = false
                 }, shape = RoundedCornerShape(12.dp)) { Text("Simpan") }
             }

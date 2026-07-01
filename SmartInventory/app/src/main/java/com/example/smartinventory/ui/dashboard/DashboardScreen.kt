@@ -60,7 +60,8 @@ fun DashboardScreen(
             item {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     StatBox("Barang", stats?.totalProducts?.toString() ?: "0", Modifier.weight(1f))
-                    StatBox("Brands", stats?.totalSuppliers?.toString() ?: "0", Modifier.weight(1f))
+                    StatBox("Rak", stats?.totalProducts?.toString() ?: "0", Modifier.weight(1f)) // Misal total rak
+                    StatBox("Merk", stats?.totalSuppliers?.toString() ?: "0", Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.height(20.dp))
             }
@@ -108,11 +109,11 @@ fun DashboardScreen(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         item { SimpleMenu("Barang", Icons.Default.Inventory) { onMenuClick("barang") } }
-                        item { SimpleMenu("Brands", Icons.Default.Category) { onMenuClick("kategori") } }
+                        item { SimpleMenu("Rak", Icons.Default.Kitchen) { onMenuClick("kategori") } }
+                        item { SimpleMenu("Merk", Icons.Default.BrandingWatermark) { onMenuClick("supplier") } }
                         item { SimpleMenu("Masuk", Icons.Default.AddCircle) { onMenuClick("stok_masuk") } }
                         item { SimpleMenu("Keluar", Icons.Default.RemoveCircle) { onMenuClick("stok_keluar") } }
                         item { SimpleMenu("Riwayat", Icons.Default.History) { onMenuClick("riwayat") } }
-                        item { SimpleMenu("Prediksi", Icons.Default.AutoAwesome) { onMenuClick("prediksi") } }
                     }
                 }
             }

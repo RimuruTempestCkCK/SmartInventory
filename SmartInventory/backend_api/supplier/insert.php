@@ -2,17 +2,17 @@
 require_once '../config.php';
 
 $nama = $_POST['nama_supplier'] ?? '';
-$alamat = $_POST['alamat'] ?? '';
-$no_hp = $_POST['no_hp'] ?? '';
 
 if (!empty($nama)) {
-    $query = "INSERT INTO tbl_supplier (nama_supplier, alamat, no_hp) VALUES ('$nama', '$alamat', '$no_hp')";
+    // Di database Anda, Supplier dan Kategori sama-sama masuk ke tabel 'brands'
+    $query = "INSERT INTO brands (name) VALUES ('$nama')";
+
     if (mysqli_query($conn, $query)) {
-        echo json_encode(["status" => true, "message" => "Berhasil tambah supplier"]);
+        echo json_encode(["status" => true, "message" => "Merk '$nama' berhasil ditambahkan"]);
     } else {
-        echo json_encode(["status" => false, "message" => "Gagal tambah supplier"]);
+        echo json_encode(["status" => false, "message" => "Gagal insert ke database"]);
     }
 } else {
-    echo json_encode(["status" => false, "message" => "Data tidak lengkap"]);
+    echo json_encode(["status" => false, "message" => "Nama merk wajib diisi"]);
 }
 ?>

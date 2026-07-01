@@ -6,8 +6,7 @@ $kode = $_POST['kode_barang'] ?? '';
 $nama = $_POST['nama_barang'] ?? '';
 $kategori = $_POST['id_kategori'] ?? '';
 $merk = $_POST['id_supplier'] ?? '';
-$harga_beli = $_POST['harga'] ?? 0;
-$harga_jual = $_POST['harga'] ?? 0;
+$harga = $_POST['harga'] ?? 0;
 $stok = $_POST['stok'] ?? 0;
 
 if (!empty($id) && !empty($nama)) {
@@ -15,8 +14,8 @@ if (!empty($id) && !empty($nama)) {
                 merk = '$merk',
                 nama_barang = '$nama',
                 kategori = '$kategori',
-                harga_beli = '$harga_beli',
-                harga_jual = '$harga_jual',
+                harga_beli = '$harga',
+                harga_jual = '$harga',
                 stok = '$stok',
                 rak = '$kode'
               WHERE id = '$id'";
@@ -24,7 +23,7 @@ if (!empty($id) && !empty($nama)) {
     if (mysqli_query($conn, $query)) {
         echo json_encode(["status" => true, "message" => "Barang berhasil diupdate"]);
     } else {
-        echo json_encode(["status" => false, "message" => "Gagal update"]);
+        echo json_encode(["status" => false, "message" => "Gagal update: " . mysqli_error($conn)]);
     }
 } else {
     echo json_encode(["status" => false, "message" => "Data tidak lengkap"]);

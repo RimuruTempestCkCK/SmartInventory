@@ -5,11 +5,12 @@ $id = $_POST['id_kategori'] ?? '';
 $nama = $_POST['nama_kategori'] ?? '';
 
 if (!empty($id) && !empty($nama)) {
-    $query = "UPDATE tbl_kategori SET nama_kategori = '$nama' WHERE id_kategori = '$id'";
+    $query = "UPDATE brands SET name = '$nama' WHERE id = '$id'";
+
     if (mysqli_query($conn, $query)) {
-        echo json_encode(["status" => true, "message" => "Berhasil update kategori"]);
+        echo json_encode(["status" => true, "message" => "Rak berhasil diupdate"]);
     } else {
-        echo json_encode(["status" => false, "message" => "Gagal update kategori"]);
+        echo json_encode(["status" => false, "message" => "Gagal update"]);
     }
 } else {
     echo json_encode(["status" => false, "message" => "Data tidak lengkap"]);

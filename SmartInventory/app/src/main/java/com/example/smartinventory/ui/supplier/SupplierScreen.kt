@@ -28,6 +28,7 @@ fun SupplierScreen(
     val suppliers by viewModel.suppliers.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val message by viewModel.message.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var showDialog by remember { mutableStateOf(false) }
     var selectedSupplier by remember { mutableStateOf<Supplier?>(null) }
@@ -36,9 +37,10 @@ fun SupplierScreen(
     var phone by remember { mutableStateOf("") }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("SUPPLIERS", fontWeight = FontWeight.ExtraBold) },
+                title = { Text("MERK & BRAND", fontWeight = FontWeight.ExtraBold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
@@ -62,7 +64,7 @@ fun SupplierScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Supplier")
+                Icon(Icons.Default.Add, contentDescription = "Tambah Merk")
             }
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -101,7 +103,7 @@ fun SupplierScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
-                    if (selectedSupplier == null) "Add Supplier" else "Edit Supplier",
+                    if (selectedSupplier == null) "Tambah Merk/Brand" else "Edit Merk/Brand",
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold
                 )
@@ -111,7 +113,7 @@ fun SupplierScreen(
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Name", color = TextSecondary) },
+                        label = { Text("Nama Merk", color = TextSecondary) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = TextPrimary,
@@ -123,7 +125,7 @@ fun SupplierScreen(
                     OutlinedTextField(
                         value = address,
                         onValueChange = { address = it },
-                        label = { Text("Address", color = TextSecondary) },
+                        label = { Text("Keterangan", color = TextSecondary) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = TextPrimary,
@@ -135,7 +137,7 @@ fun SupplierScreen(
                     OutlinedTextField(
                         value = phone,
                         onValueChange = { phone = it },
-                        label = { Text("Phone Number", color = TextSecondary) },
+                        label = { Text("Kontak (Opsional)", color = TextSecondary) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = TextPrimary,
@@ -171,6 +173,7 @@ fun SupplierScreen(
 
     LaunchedEffect(message) {
         message?.let {
+            snackbarHostState.showSnackbar(it)
             viewModel.clearMessage()
         }
     }

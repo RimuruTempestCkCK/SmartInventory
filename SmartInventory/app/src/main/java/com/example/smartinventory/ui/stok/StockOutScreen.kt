@@ -26,6 +26,9 @@ fun StockOutScreen(
     viewModel: TransactionViewModel = viewModel()
 ) {
     val products by viewModel.products.collectAsState()
+    val message by viewModel.message.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    
     var showDialog by remember { mutableStateOf(false) }
     
     var selectedProductId by remember { mutableStateOf("") }
@@ -34,6 +37,7 @@ fun StockOutScreen(
     val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("STOCK OUT", fontWeight = FontWeight.ExtraBold) },
@@ -93,5 +97,12 @@ fun StockOutScreen(
                 }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) { Text("Save") }
             }
         )
+    }
+
+    LaunchedEffect(message) {
+        message?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearMessage()
+        }
     }
 }

@@ -4,11 +4,12 @@ require_once '../config.php';
 $id = $_POST['id_kategori'] ?? '';
 
 if (!empty($id)) {
-    $query = "DELETE FROM tbl_kategori WHERE id_kategori = '$id'";
+    $query = "DELETE FROM brands WHERE id = '$id'";
+
     if (mysqli_query($conn, $query)) {
-        echo json_encode(["status" => true, "message" => "Berhasil hapus kategori"]);
+        echo json_encode(["status" => true, "message" => "Rak berhasil dihapus"]);
     } else {
-        echo json_encode(["status" => false, "message" => "Gagal hapus kategori"]);
+        echo json_encode(["status" => false, "message" => "Gagal hapus database"]);
     }
 } else {
     echo json_encode(["status" => false, "message" => "ID tidak ditemukan"]);
