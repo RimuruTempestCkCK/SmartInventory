@@ -46,7 +46,7 @@ fun CategoryScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DiscordCanvas,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 )
             )
@@ -58,17 +58,17 @@ fun CategoryScreen(
                     categoryName = ""
                     showDialog = true
                 },
-                containerColor = DiscordBlurple,
+                containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Category")
             }
         },
-        containerColor = DiscordCanvas
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             if (isLoading && categories.isEmpty()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = DiscordBlurple)
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = MaterialTheme.colorScheme.primary)
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -95,11 +95,11 @@ fun CategoryScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            containerColor = DiscordSurfaceIndigo,
+            containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
                     if (selectedCategory == null) "Add Category" else "Edit Category",
-                    color = Color.White,
+                    color = TextPrimary,
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -107,12 +107,12 @@ fun CategoryScreen(
                 OutlinedTextField(
                     value = categoryName,
                     onValueChange = { categoryName = it },
-                    label = { Text("Category Name", color = Color.Gray) },
+                    label = { Text("Category Name", color = TextSecondary) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = DiscordBlurple,
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = Color.Gray
                     )
                 )
@@ -127,7 +127,7 @@ fun CategoryScreen(
                         }
                         showDialog = false
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = DiscordBlurple)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text("Save")
                 }
@@ -157,7 +157,8 @@ fun CategoryItem(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = DiscordSurfaceIndigo)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
@@ -166,17 +167,17 @@ fun CategoryItem(
         ) {
             Text(
                 category.name,
-                color = Color.White,
+                color = TextPrimary,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f)
             )
             Row {
                 IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = DiscordBlurple)
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownSecondary)
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = ErrorRed)
                 }
             }
         }

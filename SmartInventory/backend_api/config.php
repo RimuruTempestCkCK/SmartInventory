@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db   = "db_inventory_aksesoris"; // Sesuaikan dengan nama database lama Anda
+$db   = "db_inventory_aksesoris"; 
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 

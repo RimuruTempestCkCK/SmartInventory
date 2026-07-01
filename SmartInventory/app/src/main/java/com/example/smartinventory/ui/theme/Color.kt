@@ -2,16 +2,15 @@ package com.example.smartinventory.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Discord Design Colors
-val DiscordBlurple = Color(0xFF5865F2)
-val DiscordGreen = Color(0xFF35ED7E)
-val DiscordMagenta = Color(0xFFEC48BD)
-val DiscordLink = Color(0xFF00B0F4)
-val DiscordCanvas = Color(0xFF0A0D3A)
-val DiscordSurfaceIndigo = Color(0xFF1E2353)
-val DiscordSurfaceOnyx = Color(0xFF23272A)
-val DiscordSurfaceBlack = Color(0xFF000000)
-val DiscordInk = Color(0xFFFFFFFF)
-val DiscordInkDark = Color(0xFF000000)
-val DiscordMuted = Color(0xFF333333)
-val DiscordHairline = Color(0xFF23272A)
+// Professional Monochrome & Light Brown Palette
+val BrownPrimary = Color(0xFF8D6E63)     // Cokelat Kopi
+val BrownSecondary = Color(0xFFA1887F)   // Cokelat Susu
+val BrownAccent = Color(0xFFD7CCC8)      // Krem Terang
+val AppBackground = Color(0xFFF5F5F5)    // Abu-abu Terang (Monokrom)
+val AppSurface = Color(0xFFFFFFFF)       // Putih Bersih
+val TextPrimary = Color(0xFF3E2723)      // Cokelat Gelap (Teks Utama)
+val TextSecondary = Color(0xFF757575)    // Abu-abu (Teks Sekunder)
+
+val SuccessGreen = Color(0xFF4CAF50)
+val ErrorRed = Color(0xFFE53935)
+val DividerColor = Color(0xFFEEEEEE)

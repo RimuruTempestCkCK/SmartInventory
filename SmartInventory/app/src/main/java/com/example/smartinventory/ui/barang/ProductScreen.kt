@@ -1,5 +1,7 @@
 package com.example.smartinventory.ui.barang
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,49 +31,65 @@ fun ProductScreen(
     val suppliers by viewModel.suppliers.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+    var searchQuery by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var selectedProduct by remember { mutableStateOf<Product?>(null) }
     
     var code by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
-    var catId by remember { mutableStateOf("") }
-    var supId by remember { mutableStateOf("") }
+    var catName by remember { mutableStateOf("") }
+    var supName by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var stock by remember { mutableStateOf("") }
 
+    val filteredProducts = products.filter { 
+        it.name.contains(searchQuery, ignoreCase = true) || it.code.contains(searchQuery, ignoreCase = true)
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("PRODUCTS", fontWeight = FontWeight.ExtraBold) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DiscordCanvas, titleContentColor = Color.White)
-            )
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
+                TopAppBar(
+                    title = { Text("PRODUK", fontWeight = FontWeight.ExtraBold, color = Color.White) },
+                    navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back", tint = Color.White) } },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
+                )
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text("Cari aksesoris...", color = Color.LightGray) },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.White) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                        focusedBorderColor = Color.White, unfocusedBorderColor = Color.White.copy(alpha = 0.5f)
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
+                )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 selectedProduct = null
-                code = ""; name = ""; catId = ""; supId = ""; price = ""; stock = ""
+                code = ""; name = ""; catName = ""; supName = ""; price = ""; stock = ""
                 showDialog = true
-            }, containerColor = DiscordBlurple, contentColor = Color.White) {
-                Icon(Icons.Default.Add, contentDescription = "Add Product")
+            }, containerColor = MaterialTheme.colorScheme.primary, contentColor = Color.White) {
+                Icon(Icons.Default.Add, "Tambah")
             }
         },
-        containerColor = DiscordCanvas
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             if (isLoading && products.isEmpty()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = DiscordBlurple)
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else {
                 LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(products) { product ->
+                    items(filteredProducts) { product ->
                         ProductItem(product, onEdit = {
                             selectedProduct = product
-                            code = product.code; name = product.name; catId = product.categoryId; supId = product.supplierId
-                            price = product.price.toString(); stock = product.stock.toString()
+                            code = product.code; name = product.name; catName = product.categoryName ?: ""
+                            supName = product.supplierName ?: ""; price = product.price.toString(); stock = product.stock.toString()
                             showDialog = true
                         }, onDelete = { viewModel.removeProduct(product.id ?: "") })
                     }
@@ -83,42 +101,69 @@ fun ProductScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            containerColor = DiscordSurfaceIndigo,
-            title = { Text(if (selectedProduct == null) "Add Product" else "Edit Product", color = Color.White, fontWeight = FontWeight.Bold) },
+            containerColor = MaterialTheme.colorScheme.surface,
+            title = { Text(if (selectedProduct == null) "Tambah Barang" else "Edit Barang", color = TextPrimary, fontWeight = FontWeight.Bold) },
             text = {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    item { ProductField("Code", code) { code = it } }
-                    item { ProductField("Name", name) { name = it } }
-                    item { 
-                        Text("Category", color = Color.Gray, fontSize = 12.sp)
-                        categories.forEach { cat ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(selected = catId == cat.id, onClick = { catId = cat.id ?: "" })
-                                Text(cat.name, color = Color.White)
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    item { ProductField("Nama Barang", name) { name = it } }
+                    item { ProductField("Kode Rak", code) { code = it } }
+                    
+                    // Dropdown untuk Kategori
+                    item {
+                        var expanded by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+                            OutlinedTextField(
+                                value = catName, onValueChange = {}, readOnly = true,
+                                label = { Text("Pilih Kategori") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                modifier = Modifier.menuAnchor().fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                                categories.forEach { cat ->
+                                    DropdownMenuItem(
+                                        text = { Text(cat.name) },
+                                        onClick = { catName = cat.name; expanded = false }
+                                    )
+                                }
                             }
                         }
                     }
-                    item { 
-                        Text("Supplier", color = Color.Gray, fontSize = 12.sp)
-                        suppliers.forEach { sup ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(selected = supId == sup.id, onClick = { supId = sup.id ?: "" })
-                                Text(sup.name, color = Color.White)
+
+                    // Dropdown untuk Merk/Supplier
+                    item {
+                        var expanded by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+                            OutlinedTextField(
+                                value = supName, onValueChange = {}, readOnly = true,
+                                label = { Text("Pilih Merk/Brand") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                modifier = Modifier.menuAnchor().fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                                suppliers.forEach { sup ->
+                                    DropdownMenuItem(
+                                        text = { Text(sup.name) },
+                                        onClick = { supName = sup.name; expanded = false }
+                                    )
+                                }
                             }
                         }
                     }
-                    item { ProductField("Price", price) { price = it } }
-                    item { ProductField("Stock", stock) { stock = it } }
+
+                    item { ProductField("Harga Jual", price) { price = it } }
+                    item { ProductField("Stok Awal", stock) { stock = it } }
                 }
             },
             confirmButton = {
                 Button(onClick = {
                     val p = price.toDoubleOrNull() ?: 0.0
                     val s = stock.toIntOrNull() ?: 0
-                    if (selectedProduct == null) viewModel.addProduct(code, name, catId, supId, p, s)
-                    else viewModel.editProduct(selectedProduct!!.id!!, code, name, catId, supId, p, s)
+                    if (selectedProduct == null) viewModel.addProduct(code, name, catName, supName, p, s)
+                    else viewModel.editProduct(selectedProduct!!.id!!, code, name, catName, supName, p, s)
                     showDialog = false
-                }, colors = ButtonDefaults.buttonColors(containerColor = DiscordBlurple)) { Text("Save") }
+                }, shape = RoundedCornerShape(12.dp)) { Text("Simpan") }
             }
         )
     }
@@ -127,23 +172,24 @@ fun ProductScreen(
 @Composable
 fun ProductField(label: String, value: String, onValueChange: (String) -> Unit) {
     OutlinedTextField(
-        value = value, onValueChange = onValueChange, label = { Text(label, color = Color.Gray) },
+        value = value, onValueChange = onValueChange, label = { Text(label) },
         modifier = Modifier.fillMaxWidth(),
-        colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = DiscordBlurple, unfocusedBorderColor = Color.Gray)
+        shape = RoundedCornerShape(12.dp)
     )
 }
 
 @Composable
 fun ProductItem(product: Product, onEdit: () -> Unit, onDelete: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = DiscordSurfaceIndigo)) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
         Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(product.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text("Code: ${product.code} | Stock: ${product.stock}", color = Color.LightGray, fontSize = 14.sp)
-                Text("Price: Rp ${product.price}", color = DiscordGreen, fontWeight = FontWeight.SemiBold)
+                Text(product.name, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("${product.supplierName} • ${product.categoryName}", color = TextSecondary, fontSize = 12.sp)
+                Text("Rak: ${product.code} | Stok: ${product.stock}", color = BrownPrimary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text("Rp ${String.format("%,.0f", product.price)}", color = SuccessGreen, fontWeight = FontWeight.Bold)
             }
-            IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Edit", tint = DiscordBlurple) }
-            IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Delete", tint = Color.Red) }
+            IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Edit", tint = BrownSecondary) }
+            IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Hapus", tint = ErrorRed) }
         }
     }
 }

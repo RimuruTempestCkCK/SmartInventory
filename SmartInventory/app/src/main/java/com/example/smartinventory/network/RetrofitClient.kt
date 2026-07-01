@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
     // Sesuaikan dengan IP Local atau Domain Hosting
-    private const val BASE_URL = "http://10.0.2.2/smart-inventory/api/"
+    private const val BASE_URL = "http://10.0.2.2/backend_api/"
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

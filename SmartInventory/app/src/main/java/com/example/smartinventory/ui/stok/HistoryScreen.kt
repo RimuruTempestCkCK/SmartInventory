@@ -30,25 +30,25 @@ fun HistoryScreen(
             TopAppBar(
                 title = { Text("HISTORY", fontWeight = FontWeight.ExtraBold) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back", tint = Color.White) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DiscordCanvas, titleContentColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, titleContentColor = Color.White)
             )
         },
-        containerColor = DiscordCanvas
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         LazyColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(history) { item ->
-                Card(colors = CardDefaults.cardColors(containerColor = DiscordSurfaceIndigo)) {
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                     Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column {
-                            Text(item.productName ?: "Unknown", color = Color.White, fontWeight = FontWeight.Bold)
-                            Text("${item.date} | ${item.type}", color = Color.Gray, fontSize = 12.sp)
+                            Text(item.productName ?: "Unknown", color = TextPrimary, fontWeight = FontWeight.Bold)
+                            Text("${item.date} | ${item.type}", color = TextSecondary, fontSize = 12.sp)
                             if (!item.info.isNullOrEmpty()) {
-                                Text(item.info, color = Color.LightGray, fontSize = 11.sp)
+                                Text(item.info, color = TextSecondary, fontSize = 11.sp)
                             }
                         }
                         Text(
                             text = if (item.type == "Masuk") "+${item.quantity}" else "-${item.quantity}",
-                            color = if (item.type == "Masuk") DiscordGreen else DiscordMagenta,
+                            color = if (item.type == "Masuk") SuccessGreen else ErrorRed,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         )

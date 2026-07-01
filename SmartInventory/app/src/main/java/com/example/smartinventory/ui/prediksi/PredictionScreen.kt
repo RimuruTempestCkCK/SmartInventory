@@ -35,42 +35,43 @@ fun PredictionScreen(
             TopAppBar(
                 title = { Text("AI PREDICTION", fontWeight = FontWeight.ExtraBold) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back", tint = Color.White) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DiscordCanvas, titleContentColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, titleContentColor = Color.White)
             )
         },
-        containerColor = DiscordCanvas
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
             modifier = Modifier.padding(padding).fillMaxSize().padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(Icons.Default.AutoAwesome, "AI", tint = DiscordMagenta, modifier = Modifier.size(80.dp))
+            Icon(Icons.Default.AutoAwesome, "AI", tint = BrownPrimary, modifier = Modifier.size(80.dp))
             Spacer(modifier = Modifier.height(24.dp))
-            Text("Naive Bayes Analysis", style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Bold)
-            Text("Predicting stock needs based on historical data patterns.", color = Color.Gray, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 16.dp))
+            Text("Naive Bayes Analysis", style = MaterialTheme.typography.headlineSmall, color = TextPrimary, fontWeight = FontWeight.Bold)
+            Text("Predicting stock needs based on historical data patterns.", color = TextSecondary, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 16.dp))
             
             Spacer(modifier = Modifier.height(32.dp))
             
             if (isLoading) {
-                CircularProgressIndicator(color = DiscordBlurple)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             } else if (prediction != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = DiscordSurfaceIndigo)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(2.dp)
                 ) {
                     Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("PREDICTION RESULT", color = Color.Gray, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                        Text(prediction!!.result, color = if (prediction!!.result.contains("Aman")) DiscordGreen else DiscordMagenta, fontSize = 32.sp, fontWeight = FontWeight.ExtraBold)
+                        Text("PREDICTION RESULT", color = TextSecondary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text(prediction!!.result, color = if (prediction!!.result.contains("Aman")) SuccessGreen else ErrorRed, fontSize = 32.sp, fontWeight = FontWeight.ExtraBold)
                         Spacer(modifier = Modifier.height(8.dp))
                         LinearProgressIndicator(
                             progress = prediction!!.probability.toFloat(),
                             modifier = Modifier.fillMaxWidth().height(8.dp),
-                            color = DiscordBlurple,
-                            trackColor = DiscordSurfaceBlack
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = DividerColor
                         )
-                        Text("Probability: ${(prediction!!.probability * 100).toInt()}%", color = Color.LightGray, fontSize = 14.sp)
+                        Text("Probability: ${(prediction!!.probability * 100).toInt()}%", color = TextSecondary, fontSize = 14.sp)
                     }
                 }
             }
@@ -80,7 +81,7 @@ fun PredictionScreen(
             Button(
                 onClick = { viewModel.analyze() },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = DiscordBlurple),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text("RUN ANALYSIS", fontWeight = FontWeight.Bold)

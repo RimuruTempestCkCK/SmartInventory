@@ -45,7 +45,7 @@ fun SupplierScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DiscordCanvas,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 )
             )
@@ -59,17 +59,17 @@ fun SupplierScreen(
                     phone = ""
                     showDialog = true
                 },
-                containerColor = DiscordBlurple,
+                containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Supplier")
             }
         },
-        containerColor = DiscordCanvas
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             if (isLoading && suppliers.isEmpty()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = DiscordBlurple)
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = MaterialTheme.colorScheme.primary)
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -98,11 +98,11 @@ fun SupplierScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            containerColor = DiscordSurfaceIndigo,
+            containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
                     if (selectedSupplier == null) "Add Supplier" else "Edit Supplier",
-                    color = Color.White,
+                    color = TextPrimary,
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -111,36 +111,36 @@ fun SupplierScreen(
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Name", color = Color.Gray) },
+                        label = { Text("Name", color = TextSecondary) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedBorderColor = DiscordBlurple,
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = Color.Gray
                         )
                     )
                     OutlinedTextField(
                         value = address,
                         onValueChange = { address = it },
-                        label = { Text("Address", color = Color.Gray) },
+                        label = { Text("Address", color = TextSecondary) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedBorderColor = DiscordBlurple,
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = Color.Gray
                         )
                     )
                     OutlinedTextField(
                         value = phone,
                         onValueChange = { phone = it },
-                        label = { Text("Phone Number", color = Color.Gray) },
+                        label = { Text("Phone Number", color = TextSecondary) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedBorderColor = DiscordBlurple,
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = Color.Gray
                         )
                     )
@@ -156,7 +156,7 @@ fun SupplierScreen(
                         }
                         showDialog = false
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = DiscordBlurple)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text("Save")
                 }
@@ -185,7 +185,8 @@ fun SupplierItem(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = DiscordSurfaceIndigo)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
@@ -193,16 +194,16 @@ fun SupplierItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(supplier.name, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(supplier.phone ?: "-", color = Color.LightGray, fontSize = 14.sp)
-                Text(supplier.address ?: "-", color = Color.Gray, fontSize = 12.sp)
+                Text(supplier.name, color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(supplier.phone ?: "-", color = TextSecondary, fontSize = 14.sp)
+                Text(supplier.address ?: "-", color = TextSecondary, fontSize = 12.sp)
             }
             Row {
                 IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = DiscordBlurple)
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = BrownSecondary)
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = ErrorRed)
                 }
             }
         }

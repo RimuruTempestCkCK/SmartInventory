@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -33,65 +34,47 @@ fun LoginScreen(
             val user = (loginState as LoginResult.Success).response.user
             if (user != null) {
                 prefManager.saveLoginStatus(true)
-                prefManager.saveUser(
-                    user.id ?: "",
-                    user.username,
-                    user.name ?: "",
-                    user.level ?: ""
-                )
+                prefManager.saveUser(user.id ?: "", user.username, user.name ?: "", user.level ?: "")
                 onLoginSuccess()
             }
         }
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DiscordCanvas),
+        modifier = Modifier.fillMaxSize().background(
+            Brush.verticalGradient(listOf(BrownPrimary, BrownSecondary))
+        ),
         contentAlignment = Alignment.Center
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = DiscordSurfaceIndigo
-            ),
-            shape = RoundedCornerShape(16.dp)
+            modifier = Modifier.fillMaxWidth().padding(32.dp),
+            colors = CardDefaults.cardColors(containerColor = AppSurface),
+            shape = RoundedCornerShape(24.dp),
+            elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Column(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .fillMaxWidth(),
+                modifier = Modifier.padding(28.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Welcome back!",
+                    text = "Smart Inventory",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
+                    color = TextPrimary,
+                    fontWeight = FontWeight.ExtraBold
                 )
                 Text(
-                    text = "We're so excited to see you again!",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.LightGray,
-                    modifier = Modifier.padding(bottom = 24.dp)
+                    text = "RianPhoneShop Management",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(bottom = 32.dp)
                 )
 
                 OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
-                    label = { Text("USERNAME", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                    label = { Text("Username") },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedContainerColor = DiscordSurfaceBlack,
-                        unfocusedContainerColor = DiscordSurfaceBlack,
-                        focusedBorderColor = DiscordBlurple,
-                        unfocusedBorderColor = Color.Transparent
-                    ),
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(12.dp),
                     singleLine = true
                 )
 
@@ -100,49 +83,35 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("PASSWORD", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                    label = { Text("Password") },
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = PasswordVisualTransformation(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedContainerColor = DiscordSurfaceBlack,
-                        unfocusedContainerColor = DiscordSurfaceBlack,
-                        focusedBorderColor = DiscordBlurple,
-                        unfocusedBorderColor = Color.Transparent
-                    ),
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(12.dp),
                     singleLine = true
                 )
 
                 if (loginState is LoginResult.Error) {
                     Text(
                         text = (loginState as LoginResult.Error).message,
-                        color = Color.Red,
+                        color = ErrorRed,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = {
-                        viewModel.login(username, password)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = DiscordBlurple
-                    ),
-                    shape = RoundedCornerShape(4.dp),
+                    onClick = { viewModel.login(username, password) },
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrownPrimary),
+                    shape = RoundedCornerShape(12.dp),
                     enabled = loginState !is LoginResult.Loading
                 ) {
                     if (loginState is LoginResult.Loading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                     } else {
-                        Text("Log In", fontWeight = FontWeight.Bold)
+                        Text("MASUK SEKARANG", fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                     }
                 }
             }

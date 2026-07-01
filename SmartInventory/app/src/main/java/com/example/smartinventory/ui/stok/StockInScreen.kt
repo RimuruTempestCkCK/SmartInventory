@@ -40,15 +40,15 @@ fun StockInScreen(
             TopAppBar(
                 title = { Text("STOCK IN", fontWeight = FontWeight.ExtraBold) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back", tint = Color.White) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DiscordCanvas, titleContentColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, titleContentColor = Color.White)
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showDialog = true }, containerColor = DiscordGreen, contentColor = DiscordInkDark) {
+            FloatingActionButton(onClick = { showDialog = true }, containerColor = SuccessGreen, contentColor = Color.White) {
                 Icon(Icons.Default.Add, "Add Stock In")
             }
         },
-        containerColor = DiscordCanvas
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         // List of Stock In History (Filtered)
         val history by viewModel.history.collectAsState()
@@ -56,13 +56,13 @@ fun StockInScreen(
 
         LazyColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(stockInHistory) { item ->
-                Card(colors = CardDefaults.cardColors(containerColor = DiscordSurfaceIndigo)) {
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                     Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column {
-                            Text(item.productName ?: "Unknown", color = Color.White, fontWeight = FontWeight.Bold)
-                            Text(item.date, color = Color.Gray, fontSize = 12.sp)
+                            Text(item.productName ?: "Unknown", color = TextPrimary, fontWeight = FontWeight.Bold)
+                            Text(item.date, color = TextSecondary, fontSize = 12.sp)
                         }
-                        Text("+${item.quantity}", color = DiscordGreen, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text("+${item.quantity}", color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
                 }
             }
@@ -72,24 +72,24 @@ fun StockInScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            containerColor = DiscordSurfaceIndigo,
-            title = { Text("New Stock In", color = Color.White, fontWeight = FontWeight.Bold) },
+            containerColor = MaterialTheme.colorScheme.surface,
+            title = { Text("New Stock In", color = TextPrimary, fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Select Product", color = Color.Gray)
+                    Text("Select Product", color = TextSecondary)
                     products.forEach { p ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             RadioButton(selected = selectedProductId == p.id, onClick = { selectedProductId = p.id ?: "" })
-                            Text(p.name, color = Color.White)
+                            Text(p.name, color = TextPrimary)
                         }
                     }
                     OutlinedTextField(
-                        value = quantity, onValueChange = { quantity = it }, label = { Text("Quantity", color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White)
+                        value = quantity, onValueChange = { quantity = it }, label = { Text("Quantity", color = TextSecondary) },
+                        modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary)
                     )
                     OutlinedTextField(
-                        value = info, onValueChange = { info = it }, label = { Text("Info", color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White)
+                        value = info, onValueChange = { info = it }, label = { Text("Info", color = TextSecondary) },
+                        modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary)
                     )
                 }
             },
@@ -97,7 +97,7 @@ fun StockInScreen(
                 Button(onClick = {
                     viewModel.addStockIn(selectedProductId, quantity.toIntOrNull() ?: 0, date, info)
                     showDialog = false
-                }, colors = ButtonDefaults.buttonColors(containerColor = DiscordBlurple)) { Text("Save") }
+                }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) { Text("Save") }
             }
         )
     }

@@ -7,45 +7,29 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val DiscordColorScheme = darkColorScheme(
-    primary = DiscordBlurple,
-    onPrimary = DiscordInk,
-    secondary = DiscordGreen,
-    onSecondary = DiscordInkDark,
-    tertiary = DiscordMagenta,
-    onTertiary = DiscordInk,
-    background = DiscordCanvas,
-    onBackground = DiscordInk,
-    surface = DiscordSurfaceIndigo,
-    onSurface = DiscordInk,
-    error = Color.Red,
-    onError = Color.White
-)
-
-// We keep a light version just in case, but Discord style is primarily dark
 private val LightColorScheme = lightColorScheme(
-    primary = DiscordBlurple,
+    primary = BrownPrimary,
     onPrimary = Color.White,
-    secondary = DiscordGreen,
-    onSecondary = DiscordInkDark,
-    tertiary = DiscordMagenta,
-    background = Color.White,
-    surface = Color.White,
-    onBackground = DiscordInkDark,
-    onSurface = DiscordInkDark
+    secondary = BrownSecondary,
+    onSecondary = Color.White,
+    tertiary = BrownAccent,
+    background = AppBackground,
+    onBackground = TextPrimary,
+    surface = AppSurface,
+    onSurface = TextPrimary,
+    error = ErrorRed,
+    onError = Color.White
 )
 
 @Composable
 fun SmartInventoryTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color disabled to strictly follow Discord Design
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DiscordColorScheme else LightColorScheme
-
+    // Kita paksa menggunakan Light Theme agar warna Cokelat Terang terlihat bagus
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = LightColorScheme,
         typography = Typography,
         content = content
     )
