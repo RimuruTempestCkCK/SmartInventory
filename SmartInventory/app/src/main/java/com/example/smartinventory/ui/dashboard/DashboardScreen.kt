@@ -126,7 +126,8 @@ fun DashboardScreen(
                     stats = stats,
                     prediction = prediction,
                     isLoading = isLoading,
-                    onMenuClick = onMenuClick
+                    onMenuClick = onMenuClick,
+                    onRefreshPrediction = { viewModel.refreshData() }
                 )
                 1 -> MasterDataTab(onMenuClick = onMenuClick)
                 2 -> TransactionTab(onMenuClick = onMenuClick)
@@ -141,7 +142,8 @@ fun DashboardHomeTab(
     stats: com.example.smartinventory.data.model.DashboardStats?,
     prediction: com.example.smartinventory.data.model.PredictionResponse?,
     isLoading: Boolean,
-    onMenuClick: (String) -> Unit
+    onMenuClick: (String) -> Unit,
+    onRefreshPrediction: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -269,6 +271,23 @@ fun DashboardHomeTab(
                                 color = TextSecondary,
                                 fontSize = 12.sp
                             )
+                            
+                            if (prediction != null) {
+                                Divider(modifier = Modifier.padding(vertical = 8.dp), color = BrownPrimary.copy(alpha = 0.1f))
+                                Text("Data Historis: ${prediction.historicalData ?: "-"}", color = TextSecondary, fontSize = 11.sp)
+                                Text("Status: ${prediction.safetyStatus ?: "-"}", color = TextSecondary, fontSize = 11.sp)
+                                
+                                if (!prediction.fastDepleting.isNullOrEmpty()) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text("Prediksi Cepat Habis:", color = ErrorRed, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                                    prediction.fastDepleting.forEach { item ->
+                                        Text("• $item", color = TextSecondary, fontSize = 10.sp)
+                                    }
+                                }
+                            }
+                        }
+                        IconButton(onClick = onRefreshPrediction) {
+                            Icon(Icons.Default.Refresh, "Analisis Ulang", tint = BrownPrimary)
                         }
                         IconButton(onClick = { onMenuClick("prediksi") }) {
                             Icon(Icons.Default.ChevronRight, null, tint = BrownPrimary)

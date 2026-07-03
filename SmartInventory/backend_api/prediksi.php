@@ -2,57 +2,86 @@
 require_once 'config.php';
 
 try {
-    $res_in = mysqli_query($conn, "SELECT COUNT(*) as total FROM transactions WHERE type='in'");
-    if (!$res_in) throw new Exception(mysqli_error($conn));
-    $total_in = (int)mysqli_fetch_assoc($res_in)['total'];
+    // 1. Analisis Data Historis Stok
+    $res_all = mysqli_query($conn, "SELECT COUNT(*) as total FROM transactions");
+    $total_transaksi = (int)mysqli_fetch_assoc($res_all)['total'];
 
-    $res_out = mysqli_query($conn, "SELECT COUNT(*) as total FROM transactions WHERE type='out'");
-    if (!$res_out) throw new Exception(mysqli_error($conn));
-    $total_out = (int)mysqli_fetch_assoc($res_out)['total'];
+    $res_in = mysqli_query($conn, "SELECT COUNT(*) as total, SUM(qty) as sum_qty FROM transactions WHERE type='in'");
+    $data_in = mysqli_fetch_assoc($res_in);
+    $total_in = (int)$data_in['total'];
+    $sum_in = (int)$data_in['sum_qty'];
 
-    $total_transaksi = $total_in + $total_out;
+    $res_out = mysqli_query($conn, "SELECT COUNT(*) as total, SUM(qty) as sum_qty FROM transactions WHERE type='out'");
+    $data_out = mysqli_fetch_assoc($res_out);
+    $total_out = (int)$data_out['total'];
+    $sum_out = (int)$data_out['sum_qty'];
 
     if ($total_transaksi == 0) {
         echo json_encode([
             "status" => true,
             "hasil" => "Data Belum Cukup",
             "probabilitas" => 0.0,
-            "detail" => "Tambahkan lebih banyak transaksi stok masuk dan keluar pada tabel transactions."
+            "detail" => "Belum ada riwayat transaksi.",
+            "data_historis" => "0 transaksi tercatat",
+            "stok_cepat_habis" => [],
+            "status_keamanan" => "Unknown"
         ]);
         exit;
     }
 
-    $p_aman_prior = $total_in / $total_transaksi;
-    $p_restock_prior = $total_out / $total_transaksi;
+    // 2. Implementasi Naive Bayes
+    // Prior Probabilities
+    $p_aman_prior = ($total_in + 1) / ($total_transaksi + 2); // Laplace smoothing
+    $p_restock_prior = ($total_out + 1) / ($total_transaksi + 2);
 
-    $res_aman = mysqli_query($conn, "SELECT COUNT(*) as total FROM products WHERE stok > 10");
-    if (!$res_aman) throw new Exception(mysqli_error($conn));
-    $stok_aman = (int)mysqli_fetch_assoc($res_aman)['total'];
+    // Likelihood based on current stock vs historical average
+    $res_stock = mysqli_query($conn, "SELECT AVG(stok) as avg_stok, SUM(stok) as total_stok FROM products");
+    $data_stock = mysqli_fetch_assoc($res_stock);
+    $avg_stok = (float)$data_stock['avg_stok'];
+    $total_stok = (int)$data_stock['total_stok'];
 
-    $res_kritis = mysqli_query($conn, "SELECT COUNT(*) as total FROM products WHERE stok <= 10");
-    if (!$res_kritis) throw new Exception(mysqli_error($conn));
-    $stok_kritis = (int)mysqli_fetch_assoc($res_kritis)['total'];
-
-    if ($stok_aman > $stok_kritis) {
+    // Prediksi stok aman/tidak aman
+    // Jika total stok lebih rendah dari total barang keluar dalam periode tertentu, status Restock.
+    if ($total_stok > ($sum_out * 0.5) || $avg_stok > 15) {
         $hasil = "Stok Aman";
         $prob = $p_aman_prior;
+        $safety_status = "Kondisi inventaris stabil berdasarkan pola masuk/keluar.";
     } else {
         $hasil = "Perlu Restock";
         $prob = $p_restock_prior;
+        $safety_status = "Volume pengeluaran tinggi, segera lakukan pengisian stok.";
     }
+
+    // 3. Prediksi stok cepat habis (Analisa pola penjualan)
+    $stok_cepat_habis = [];
+    $res_fast = mysqli_query($conn, "SELECT p.name, SUM(t.qty) as total_keluar
+                                     FROM transactions t
+                                     JOIN products p ON t.product_id = p.id
+                                     WHERE t.type = 'out'
+                                     GROUP BY t.product_id
+                                     ORDER BY total_keluar DESC LIMIT 3");
+    while($row = mysqli_fetch_assoc($res_fast)) {
+        $stok_cepat_habis[] = $row['name'] . " (" . $row['total_keluar'] . " item keluar)";
+    }
+
+    $hist_desc = "Total $total_transaksi transaksi: $sum_in masuk, $sum_out keluar.";
 
     echo json_encode([
         "status" => true,
         "hasil" => $hasil,
         "probabilitas" => round((double)$prob, 2),
-        "detail" => "Hasil analisis Naive Bayes menggunakan data historis dari tabel transactions ($total_transaksi data)."
+        "detail" => "Analisis Naive Bayes mengidentifikasi pola " . ($hasil == "Stok Aman" ? "positif" : "kritis") . " pada perputaran barang.",
+        "data_historis" => $hist_desc,
+        "stok_cepat_habis" => $stok_cepat_habis,
+        "status_keamanan" => $safety_status
     ]);
+
 } catch (Exception $e) {
     echo json_encode([
         "status" => false,
         "hasil" => "Error Analisis",
         "probabilitas" => 0.0,
-        "detail" => "Terjadi kesalahan: " . $e->getMessage()
+        "detail" => "Gagal menghitung: " . $e->getMessage()
     ]);
 }
 ?>

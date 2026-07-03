@@ -2,7 +2,9 @@ package com.example.smartinventory.ui.prediksi
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -40,10 +42,14 @@ fun PredictionScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
+        val scrollState = rememberScrollState()
         Column(
-            modifier = Modifier.padding(padding).fillMaxSize().padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(Icons.Default.AutoAwesome, "AI", tint = BrownPrimary, modifier = Modifier.size(80.dp))
             Spacer(modifier = Modifier.height(24.dp))
@@ -72,6 +78,30 @@ fun PredictionScreen(
                             trackColor = DividerColor
                         )
                         Text("Probability: ${(prediction!!.probability * 100).toInt()}%", color = TextSecondary, fontSize = 14.sp)
+                        
+                        Divider(modifier = Modifier.padding(vertical = 16.dp), color = DividerColor)
+                        
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text("ANALISIS DATA HISTORIS", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = BrownPrimary)
+                            Text(prediction!!.historicalData ?: "-", color = TextSecondary, fontSize = 14.sp)
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            Text("KEAMANAN STOK", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = BrownPrimary)
+                            Text(prediction!!.safetyStatus ?: "-", color = TextSecondary, fontSize = 14.sp)
+
+                            if (!prediction!!.fastDepleting.isNullOrEmpty()) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text("PREDIKSI STOK CEPAT HABIS", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = ErrorRed)
+                                prediction!!.fastDepleting?.forEach { item ->
+                                    Text("• $item", color = TextSecondary, fontSize = 14.sp)
+                                }
+                            }
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("DETAIL ANALISIS", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = BrownPrimary)
+                            Text(prediction!!.details ?: "-", color = TextSecondary, fontSize = 13.sp)
+                        }
                     }
                 }
             }
